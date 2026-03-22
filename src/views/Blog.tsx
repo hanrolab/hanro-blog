@@ -27,7 +27,7 @@ export function Blog() {
       <div className="mx-auto max-w-[1100px] px-6 py-8">
         <div className="flex gap-8">
           <aside className="hidden w-[200px] shrink-0 lg:block">
-            <div className="sticky top-[80px] space-y-6 pt-8">
+            <div className="space-y-6 pt-8">
               <ProfileCard />
               <CategoryFilter selected={selectedCategory} onSelect={handleCategorySelect} />
               <VisitCounter />

@@ -170,18 +170,18 @@ function useIsMobile() {
 
 export function Home() {
   const mainRef = useRef<HTMLElement>(null)
-  const savedPage = Number(sessionStorage.getItem('portfolio-page') || '0')
-  const [currentPage, setCurrentPage] = useState(savedPage)
+  const [currentPage, setCurrentPage] = useState(0)
   const totalPages = pageLabels.length
 
   // 페이지 + 프로젝트 스크롤 복원
   useEffect(() => {
     const el = mainRef.current
     if (!el) return
-    if (savedPage > 0) {
+    const saved = Number(sessionStorage.getItem('portfolio-page') || '0')
+    if (saved > 0) {
+      setCurrentPage(saved)
       requestAnimationFrame(() => {
-        el.scrollTo({ left: savedPage * window.innerWidth, behavior: 'instant' as ScrollBehavior })
-        // 프로젝트 섹션 세로 스크롤 복원
+        el.scrollTo({ left: saved * window.innerWidth, behavior: 'instant' as ScrollBehavior })
         const savedScrollY = Number(sessionStorage.getItem('portfolio-projects-scrollY') || '0')
         if (savedScrollY > 0) {
           const projectsSection = el.querySelector('[data-scroll-y]') as HTMLElement | null

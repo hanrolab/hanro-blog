@@ -25,15 +25,15 @@ export function ProjectRow({ project, index }: ProjectRowProps) {
           {/* Year + Status */}
           <div className="flex items-center gap-2 text-[13px] font-medium text-text-muted">
             <span>{project.year}</span>
-            {project.status === 'in-progress' && (
+            {(project.status === 'in-progress' || project.status === 'operating') && (
               <>
                 <span>·</span>
-                <span className="flex items-center gap-1.5 text-green-600">
+                <span className={`flex items-center gap-1.5 ${project.status === 'operating' ? 'text-[#3182f6]' : 'text-green-600'}`}>
                   <span className="relative flex h-1.5 w-1.5">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-50" />
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-500" />
+                    <span className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-50 ${project.status === 'operating' ? 'bg-[#3182f6]' : 'bg-green-500'}`} />
+                    <span className={`relative inline-flex h-1.5 w-1.5 rounded-full ${project.status === 'operating' ? 'bg-[#3182f6]' : 'bg-green-500'}`} />
                   </span>
-                  진행중
+                  {project.status === 'operating' ? '운영중' : '진행중'}
                 </span>
               </>
             )}

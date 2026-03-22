@@ -12,7 +12,7 @@ export interface Project {
     readonly infra?: readonly string[]
   }
   readonly highlights: readonly string[]
-  readonly status: 'in-progress' | 'completed'
+  readonly status: 'in-progress' | 'completed' | 'operating'
   readonly category: string
   readonly mockupType: 'web' | 'mobile' | 'book'
   readonly accent?: string
@@ -95,7 +95,7 @@ export const projects: readonly Project[] = [
       'RevenueCat 기반 Freemium 수익화',
       'Next.js 관리자 대시보드',
     ],
-    status: 'in-progress',
+    status: 'operating' as const,
     category: 'MOBILE APP',
     techDetail: {
       frontend: ['Compose Multiplatform', 'Material 3', 'Orbit MVI'],
@@ -106,6 +106,43 @@ export const projects: readonly Project[] = [
     accent: '#10b981',
     images: {
       mobile: '/images/readip-mobile.png',
+    },
+  },
+  {
+    id: 'realm',
+    title: 'Realm',
+    subtitle: 'Developer Productivity Desktop App',
+    description:
+      '개발자를 위한 올인원 데스크톱 생산성 도구. 프로젝트 관리, 코드 스니펫 저장, API 테스트, 마크다운 노트를 하나의 앱에서 제공. Electron 기반 크로스플랫폼(macOS, Windows, Linux) 지원.',
+    role: 'Full-Stack Developer',
+    year: '2026 —',
+    techStack: [
+      'Electron',
+      'React 19',
+      'TypeScript',
+      'Tailwind CSS',
+      'SQLite',
+      'tRPC',
+    ],
+    highlights: [
+      '프로젝트별 워크스페이스 관리',
+      '코드 스니펫 저장 및 검색 (100+ 언어 하이라이팅)',
+      '내장 API 클라이언트 (REST, GraphQL)',
+      '마크다운 노트 + 위키 링크',
+      'SQLite 로컬 데이터 저장 (오프라인 지원)',
+      '크로스플랫폼 (macOS, Windows, Linux)',
+    ],
+    status: 'in-progress',
+    category: 'DESKTOP / WEB',
+    techDetail: {
+      frontend: ['React 19', 'TypeScript', 'Tailwind CSS', 'shadcn/ui'],
+      backend: ['Electron', 'tRPC', 'SQLite'],
+      infra: ['Auto Update', 'GitHub Releases'],
+    },
+    mockupType: 'web',
+    accent: '#8b5cf6',
+    images: {
+      desktop: '/images/realm-desktop.png',
     },
   },
   {

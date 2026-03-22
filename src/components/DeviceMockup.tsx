@@ -11,7 +11,7 @@ interface DeviceMockupProps {
 
 function LaptopMockup({ title, accent = '#e5e5e5', image }: { title: string; accent?: string; image?: string }) {
   return (
-    <div className="relative w-[280px] lg:w-[340px]">
+    <div className="relative w-[360px] lg:w-[480px]">
       <div className="rounded-t-xl border border-[#d1d1d1] bg-[#1a1a1a] p-1">
         <div className="flex items-center gap-1.5 rounded-t-lg bg-[#2a2a2a] px-3 py-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-[#ff5f57]" />
@@ -117,10 +117,8 @@ function BookMockup({ title }: { title: string }) {
 export function DeviceMockup({ type, title, accent, images }: DeviceMockupProps) {
   if (type === 'web') {
     return (
-      <div className="flex items-end justify-center gap-4 lg:gap-6 py-6">
-        <PhoneMockup title="모바일" accent={accent} image={images?.mobile} />
-        <LaptopMockup title="데스크톱" accent={accent} image={images?.desktop} />
-        <TabletMockup accent={accent} image={images?.tablet} label="태블릿" />
+      <div className="flex items-end justify-center py-6">
+        <LaptopMockup title="" accent={accent} image={images?.desktop} />
       </div>
     )
   }
