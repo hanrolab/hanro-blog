@@ -105,7 +105,7 @@ export function ProjectRow({ project, index }: ProjectRowProps) {
 
         {/* Right: Device Mockup */}
         <div className="mt-10 flex items-center justify-center lg:mt-0 lg:flex-1">
-          <DeviceMockup type={project.mockupType} title={project.title} accent={project.accent} images={project.images} />
+          <DeviceMockup type={project.mockupType} title={project.title} accent={project.accent} images={project.images} noDeviceFrame={project.noDeviceFrame} />
         </div>
       </div>
     </motion.div>

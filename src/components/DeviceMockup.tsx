@@ -2,6 +2,7 @@ interface DeviceMockupProps {
   readonly type: 'web' | 'mobile' | 'book'
   readonly title: string
   readonly accent?: string
+  readonly noDeviceFrame?: boolean
   readonly images?: {
     readonly desktop?: string
     readonly tablet?: string
@@ -114,7 +115,19 @@ function BookMockup({ title }: { title: string }) {
   )
 }
 
-export function DeviceMockup({ type, title, accent, images }: DeviceMockupProps) {
+function RawImageMockup({ image, title }: { image?: string; title: string }) {
+  return (
+    <div className="relative w-[160px] lg:w-[190px]">
+      {image ? (
+        <img src={image} alt={title} className="h-auto w-full" />
+      ) : (
+        <div className="aspect-[9/19] rounded-[8px] bg-bg-card" />
+      )}
+    </div>
+  )
+}
+
+export function DeviceMockup({ type, title, accent, images, noDeviceFrame }: DeviceMockupProps) {
   if (type === 'web') {
     return (
       <div className="flex items-end justify-center py-6">
@@ -124,10 +137,18 @@ export function DeviceMockup({ type, title, accent, images }: DeviceMockupProps)
   }
 
   if (type === 'mobile') {
+    if (noDeviceFrame) {
+      return (
+        <div className="flex items-end justify-center gap-6 lg:gap-8 py-6">
+          <RawImageMockup image={images?.mobile} title="iOS" />
+          <RawImageMockup image={images?.desktop || images?.mobile} title="Android" />
+        </div>
+      )
+    }
     return (
       <div className="flex items-end justify-center gap-6 lg:gap-8 py-6">
         <PhoneMockup title="iOS" accent={accent} image={images?.mobile} />
-        <TabletMockup accent={accent} image={images?.tablet} label="태블릿" />
+        {images?.tablet && <TabletMockup accent={accent} image={images.tablet} label="태블릿" />}
         <PhoneMockup title="Android" accent={accent} image={images?.mobile} />
       </div>
     )

@@ -42,6 +42,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       "img-src 'self' data: blob: https://*.r2.dev https://*.r2.cloudflarestorage.com",
       "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net",
       "connect-src 'self' https://api.cloudflare.com",
+      "frame-src 'self' https://www.youtube.com",
     ].join('; ')
   )
 

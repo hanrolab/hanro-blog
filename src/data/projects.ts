@@ -16,7 +16,9 @@ export interface Project {
   readonly category: string
   readonly mockupType: 'web' | 'mobile' | 'book'
   readonly accent?: string
+  readonly noDeviceFrame?: boolean
   readonly images?: {
+    readonly hero?: string
     readonly desktop?: string
     readonly tablet?: string
     readonly mobile?: string
@@ -111,33 +113,41 @@ export const projects: readonly Project[] = [
   {
     id: 'realm',
     title: 'Realm',
-    subtitle: 'Developer Productivity Desktop App',
+    subtitle: 'Workspace Productivity & Collaboration Platform',
     description:
-      '개발자를 위한 올인원 데스크톱 생산성 도구. 프로젝트 관리, 코드 스니펫 저장, API 테스트, 마크다운 노트를 하나의 앱에서 제공. Electron 기반 크로스플랫폼(macOS, Windows, Linux) 지원.',
+      '칸반 보드, 문서 협업, 화이트보드, ERD 다이어그램, 시맨틱 검색을 통합한 워크스페이스 기반 생산성 플랫폼. Tauri 데스크톱 앱과 웹을 동시 지원하며, 18개 도메인 테이블과 pgvector 기반 AI 검색을 갖춤.',
     role: 'Full-Stack Developer',
     year: '2026 —',
     techStack: [
-      'Electron',
       'React 19',
       'TypeScript',
-      'Tailwind CSS',
-      'SQLite',
-      'tRPC',
+      'Tauri',
+      'Kotlin',
+      'Spring Boot 3',
+      'PostgreSQL',
+      'pgvector',
+      'Cloudflare R2',
+      'TipTap',
+      'tldraw',
     ],
     highlights: [
-      '프로젝트별 워크스페이스 관리',
-      '코드 스니펫 저장 및 검색 (100+ 언어 하이라이팅)',
-      '내장 API 클라이언트 (REST, GraphQL)',
-      '마크다운 노트 + 위키 링크',
-      'SQLite 로컬 데이터 저장 (오프라인 지원)',
-      '크로스플랫폼 (macOS, Windows, Linux)',
+      '칸반/간트/캘린더/리스트 4가지 보드 뷰',
+      'TipTap 리치 텍스트 + tldraw 화이트보드 통합',
+      'pgvector + Cloudflare AI 시맨틱 검색',
+      'Tauri 크로스플랫폼 데스크톱 앱 (macOS, Windows, Linux)',
+      'Google OAuth2 + JWT 인증 (Access 15분, Refresh 7일)',
+      'R2 Presigned URL 파일 업로드',
+      'ERD 다이어그램 에디터',
+      'Gmail OAuth 연동',
+      '18개 테이블, Flyway 마이그레이션',
+      'GCP Cloud Run 배포',
     ],
     status: 'in-progress',
     category: 'DESKTOP / WEB',
     techDetail: {
-      frontend: ['React 19', 'TypeScript', 'Tailwind CSS', 'shadcn/ui'],
-      backend: ['Electron', 'tRPC', 'SQLite'],
-      infra: ['Auto Update', 'GitHub Releases'],
+      frontend: ['React 19', 'TypeScript', 'Vite', 'Tailwind CSS', 'shadcn/ui', 'Zustand', 'React Query', 'TipTap', 'tldraw', 'dnd-kit'],
+      backend: ['Kotlin', 'Spring Boot 3', 'Spring Security', 'JPA', 'QueryDSL', 'JWT'],
+      infra: ['PostgreSQL + pgvector', 'Cloudflare R2', 'Cloudflare AI', 'GCP Cloud Run', 'Docker', 'Tauri'],
     },
     mockupType: 'web',
     accent: '#8b5cf6',
@@ -148,32 +158,46 @@ export const projects: readonly Project[] = [
   {
     id: 'mungnyanglog',
     title: '멍냥로그',
-    subtitle: '반려동물 기록 & 커뮤니티 앱',
+    subtitle: 'Pet Care & Family Sharing Platform',
     description:
-      '반려동물의 일상을 기록하고 공유하는 모바일 앱. 사업자 등록 후 투자 유치를 시도했으며, 카페 운영과 병행하며 개발. 펫 프로필, 건강 기록, 사진 일기, 커뮤니티 기능을 포함.',
+      '산책, 건강, 일상을 기록하며 가족 구성원과 반려동물의 유대감을 높이고, 실종동물 정보를 자연스럽게 접해 주변의 실종동물을 빠르게 찾을 수 있도록 기획한 크로스플랫폼 앱. GPS 실시간 산책 추적, AI 펫 상담사, 가족 그룹 공유, 실종동물 알림 등을 갖춘 1인 창업 프로젝트.',
     role: 'Founder & Developer',
     year: '2025 — 2026',
     techStack: [
-      'Kotlin',
-      'Jetpack Compose',
-      'Spring Boot',
+      'Kotlin Multiplatform',
+      'Compose Multiplatform',
+      'Spring Boot 4',
+      'Spring AI',
       'PostgreSQL',
       'Firebase',
+      'GCP Cloud Storage',
+      'QueryDSL',
     ],
     highlights: [
+      'Firebase OAuth 인증 (Google / Apple)',
+      '가족 그룹 생성 / 초대 / 권한 관리',
+      'GPS 실시간 산책 추적 (경로 시각화, 거리/시간)',
+      'GCP Signed URL 미디어 보안',
+      'FCM 푸시 알림 + 딥링크 네비게이션',
+      'Spring AI Function Calling 기반 AI 펫 상담사',
+      '가족 범위 게시글 공유 (사진/미디어, 펫 태깅)',
       '사업자 등록 후 투자 유치 시도',
-      '반려동물 프로필 & 건강 기록 관리',
-      '사진 일기 및 커뮤니티 기능',
       '카페 운영과 병행하며 1인 개발',
     ],
     status: 'completed',
     category: 'MOBILE APP',
     techDetail: {
-      frontend: ['Kotlin', 'Jetpack Compose'],
-      backend: ['Spring Boot', 'PostgreSQL'],
-      infra: ['Firebase', 'Docker'],
+      frontend: ['Kotlin Multiplatform', 'Compose Multiplatform', 'Voyager', 'Orbit MVI', 'Koin', 'KMP Maps', 'Coil'],
+      backend: ['Spring Boot 4', 'Kotlin', 'Spring AI', 'JPA', 'QueryDSL', 'Firebase Auth'],
+      infra: ['GCP Cloud Run', 'GCP Cloud Storage', 'Firebase FCM', 'PostgreSQL'],
     },
     mockupType: 'mobile',
     accent: '#f59e0b',
+    noDeviceFrame: true,
+    images: {
+      hero: '/images/mungnyanglog-hero.png',
+      mobile: '/images/mungnyanglog-health-record.png',
+      desktop: '/images/mungnyanglog-ai-chat.png',
+    },
   },
 ] as const

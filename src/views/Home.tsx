@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { ChevronDown, Github, Instagram, Linkedin, Mail } from 'lucide-react'
+import { ChevronDown, Github, Instagram, Linkedin } from 'lucide-react'
 import { SiSpringboot, SiKotlin, SiReact, SiTypescript, SiPostgresql, SiRedis, SiDocker } from 'react-icons/si'
 import { RiRobot2Fill } from 'react-icons/ri'
 import { projects } from '@/data/projects'
@@ -60,21 +60,6 @@ function SectionTitle({ children }: { children: string }) {
       <h3 className="text-[1.125rem] font-bold text-text-primary">{children}</h3>
       <div className="mt-3 h-px bg-border" />
     </div>
-  )
-}
-
-function PeriodLabel({ period }: { period: string }) {
-  const isActive = period.includes('재직중') || period.includes('운영중')
-  return (
-    <span className="flex w-[150px] shrink-0 items-center gap-2.5 whitespace-nowrap">
-      <span className={`h-2 w-2 rounded-full ${period.includes('재직중') ? 'bg-[#3182f6]' : period.includes('운영중') ? 'bg-[#20c997]' : 'bg-border'}`} />
-      <span className="text-[0.9375rem] text-text-muted">
-        {isActive
-          ? <>{period.replace(/재직중|운영중/, '')}<span className={`font-bold ${period.includes('재직중') ? 'text-[#3182f6]' : 'text-[#20c997]'}`}>{period.match(/재직중|운영중/)?.[0]}</span></>
-          : period
-        }
-      </span>
-    </span>
   )
 }
 
@@ -173,24 +158,21 @@ export function Home() {
   const [currentPage, setCurrentPage] = useState(0)
   const totalPages = pageLabels.length
 
-  // 페이지 + 프로젝트 스크롤 복원
+  // 페이지 + 세로 스크롤 복원
   useEffect(() => {
     const el = mainRef.current
     if (!el) return
     const saved = Number(sessionStorage.getItem('portfolio-page') || '0')
-    if (saved > 0) {
-      setCurrentPage(saved)
-      requestAnimationFrame(() => {
+    setCurrentPage(saved)
+    requestAnimationFrame(() => {
+      if (saved > 0) {
         el.scrollTo({ left: saved * window.innerWidth, behavior: 'instant' as ScrollBehavior })
-        const savedScrollY = Number(sessionStorage.getItem('portfolio-projects-scrollY') || '0')
-        if (savedScrollY > 0) {
-          const projectsSection = el.querySelector('[data-scroll-y]') as HTMLElement | null
-          if (projectsSection) {
-            projectsSection.scrollTop = savedScrollY
-          }
-        }
+      }
+      el.querySelectorAll<HTMLElement>('[data-scroll-y]').forEach((section, i) => {
+        const y = Number(sessionStorage.getItem(`portfolio-scrollY-${i}`) || '0')
+        if (y > 0) section.scrollTop = y
       })
-    }
+    })
   }, [])
 
   // 페이지 변경 시 저장
@@ -198,18 +180,18 @@ export function Home() {
     sessionStorage.setItem('portfolio-page', String(currentPage))
   }, [currentPage])
 
-  // 프로젝트 섹션 세로 스크롤 저장
+  // 모든 스크롤 가능 섹션의 세로 스크롤 저장
   useEffect(() => {
     const el = mainRef.current
     if (!el) return
-    const projectsSection = el.querySelector('[data-scroll-y]') as HTMLElement | null
-    if (!projectsSection) return
-
-    const onProjectScroll = () => {
-      sessionStorage.setItem('portfolio-projects-scrollY', String(projectsSection.scrollTop))
-    }
-    projectsSection.addEventListener('scroll', onProjectScroll, { passive: true })
-    return () => projectsSection.removeEventListener('scroll', onProjectScroll)
+    const sections = el.querySelectorAll<HTMLElement>('[data-scroll-y]')
+    const cleanups: (() => void)[] = []
+    sections.forEach((section, i) => {
+      const handler = () => sessionStorage.setItem(`portfolio-scrollY-${i}`, String(section.scrollTop))
+      section.addEventListener('scroll', handler, { passive: true })
+      cleanups.push(() => section.removeEventListener('scroll', handler))
+    })
+    return () => cleanups.forEach(fn => fn())
   }, [])
   const isMobile = useIsMobile()
 
