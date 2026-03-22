@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom'
+'use client'
+
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
 import type { Project } from '@/data/projects'
@@ -21,7 +23,7 @@ export function ProjectCard({ project, index, variant = 'default' }: ProjectCard
       className={isLarge ? 'sm:col-span-2' : ''}
     >
       <Link
-        to={`/projects/${project.id}`}
+        href={`/projects/${project.id}`}
         className="group relative block overflow-hidden border border-border bg-bg-card transition-colors duration-500 hover:bg-bg-card-hover"
       >
         <div className={`p-8 ${isLarge ? 'md:p-16' : 'md:p-12'}`}>

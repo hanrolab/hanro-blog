@@ -1,5 +1,8 @@
+'use client'
+
 import { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 
@@ -9,7 +12,7 @@ const navItems = [
 ] as const
 
 export function Header() {
-  const location = useLocation()
+  const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
@@ -20,14 +23,14 @@ export function Header() {
   }, [])
 
   return (
-    <header 
+    <header
       className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 bg-bg ${
         scrolled ? 'border-b border-border' : 'border-b border-transparent'
       }`}
     >
       <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-6 md:px-10">
         <Link
-          to="/"
+          href="/"
           className="text-[14px] font-bold tracking-[0.2em] text-text-primary uppercase"
         >
           Jinsung Joo
@@ -37,13 +40,13 @@ export function Header() {
         <nav className="hidden md:flex items-center gap-10">
           {navItems.map((item) => {
             const isActive = item.path === '/'
-              ? location.pathname === '/' || location.pathname.startsWith('/projects')
+              ? pathname === '/' || pathname.startsWith('/projects')
               : false
 
             return (
               <Link
                 key={item.path}
-                to={item.path === '/projects' ? '/#projects' : item.path}
+                href={item.path === '/projects' ? '/#projects' : item.path}
                 className={`text-[12px] font-semibold tracking-[0.15em] transition-colors ${
                   isActive ? 'text-text-primary' : 'text-text-muted hover:text-text-primary'
                 }`}
@@ -84,7 +87,7 @@ export function Header() {
               {navItems.map((item) => (
                 <Link
                   key={item.path}
-                  to={item.path === '/projects' ? '/#projects' : item.path}
+                  href={item.path === '/projects' ? '/#projects' : item.path}
                   onClick={() => setMobileOpen(false)}
                   className="text-[18px] font-medium tracking-[0.1em] text-text-primary"
                 >

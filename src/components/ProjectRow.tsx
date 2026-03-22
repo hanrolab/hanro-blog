@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom'
+'use client'
+
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
 import type { Project } from '@/data/projects'
@@ -92,7 +94,7 @@ export function ProjectRow({ project, index }: ProjectRowProps) {
           {/* Action */}
           <div className="mt-10">
             <Link
-              to={`/portfolio/projects/${project.id}`}
+              href={`/portfolio/projects/${project.id}`}
               className="inline-flex h-14 items-center gap-2 rounded-md bg-text-primary px-10 text-[14px] font-medium text-bg transition-opacity hover:opacity-80"
             >
               READ MORE

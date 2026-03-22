@@ -1,0 +1,11 @@
+name = "hanro-blog"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "hanro-blog"
+database_id = "ec228287-2c96-4ec1-8f49-3331447b9ee5"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "hanro-bucket"
