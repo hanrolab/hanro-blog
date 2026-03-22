@@ -1,0 +1,39 @@
+import { SiSpringboot, SiKotlin, SiReact, SiTypescript, SiPostgresql, SiRedis, SiDocker, SiNextdotjs, SiFirebase, SiJetpackcompose, SiSupabase, SiTailwindcss, SiMinutemailer } from 'react-icons/si'
+import { RiRobot2Fill } from 'react-icons/ri'
+import { TbDatabase, TbApi, TbBrandOauth, TbPackage, TbBox } from 'react-icons/tb'
+import type { IconType } from 'react-icons'
+
+export const skillIconMap: Record<string, { icon: IconType; color: string }> = {
+  'Spring Boot': { icon: SiSpringboot, color: '#6DB33F' },
+  'Spring Boot 4': { icon: SiSpringboot, color: '#6DB33F' },
+  'Spring Security': { icon: SiSpringboot, color: '#6DB33F' },
+  'Kotlin': { icon: SiKotlin, color: '#7F52FF' },
+  'Kotlin Multiplatform': { icon: SiKotlin, color: '#7F52FF' },
+  'React': { icon: SiReact, color: '#61DAFB' },
+  'React 19': { icon: SiReact, color: '#61DAFB' },
+  'TypeScript': { icon: SiTypescript, color: '#3178C6' },
+  'PostgreSQL': { icon: SiPostgresql, color: '#4169E1' },
+  'Redis': { icon: SiRedis, color: '#DC382D' },
+  'Docker': { icon: SiDocker, color: '#2496ED' },
+  'Next.js': { icon: SiNextdotjs, color: '#111111' },
+  'Firebase': { icon: SiFirebase, color: '#FFCA28' },
+  'Compose': { icon: SiJetpackcompose, color: '#4285F4' },
+  'Jetpack Compose': { icon: SiJetpackcompose, color: '#4285F4' },
+  'Supabase': { icon: SiSupabase, color: '#3FCF8E' },
+  'Gemini AI': { icon: RiRobot2Fill, color: '#FF6F00' },
+  'AI/ML': { icon: RiRobot2Fill, color: '#FF6F00' },
+  'React Query': { icon: SiReact, color: '#FF4154' },
+  'Tailwind CSS': { icon: SiTailwindcss, color: '#06B6D4' },
+  'Zustand': { icon: TbPackage, color: '#443E38' },
+  'shadcn/ui': { icon: TbBox, color: '#111111' },
+  'RevenueCat': { icon: SiMinutemailer, color: '#F25A5A' },
+  'JPA': { icon: TbDatabase, color: '#59666C' },
+  'QueryDSL': { icon: TbApi, color: '#0769AD' },
+  'MinIO': { icon: TbDatabase, color: '#C72C48' },
+  'Material 3': { icon: TbBox, color: '#757575' },
+  'Orbit MVI': { icon: TbPackage, color: '#7F52FF' },
+  'Next.js Admin': { icon: SiNextdotjs, color: '#111111' },
+  'OAuth2': { icon: TbBrandOauth, color: '#EB5424' },
+  'JWT': { icon: TbApi, color: '#000000' },
+  'Java': { icon: SiKotlin, color: '#ED8B00' },
+}
