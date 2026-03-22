@@ -4,11 +4,11 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { BlogHeader } from '@/components/BlogHeader'
 import { TiptapEditor } from '@/components/editor/TiptapEditor'
-import { ChevronDown, ImagePlus, Save, Check, Plus } from 'lucide-react'
+import { ChevronDown, ImagePlus, Save, Check, Plus, X } from 'lucide-react'
 import { uploadImageToR2 } from '@/lib/r2-upload'
 import type { Post, Category } from '@/lib/types'
 import type { Editor } from '@tiptap/core'
-import { useToast } from '@/lib/useToast'
+import { toast } from 'sonner'
 
 interface WriteViewProps {
   editMode?: boolean
@@ -45,14 +45,13 @@ export function WriteView({ editMode = false, initialPost }: WriteViewProps) {
   const [imageUploading, setImageUploading] = useState(false)
   const [textStats, setTextStats] = useState({ chars: 0, words: 0 })
   const imageInputRef = useRef<HTMLInputElement>(null)
-  const { showToast } = useToast()
   const [categories, setCategories] = useState<Category[]>([])
   const [newCategoryName, setNewCategoryName] = useState('')
   const [isAddingCategory, setIsAddingCategory] = useState(false)
 
   // Fetch categories from API
   useEffect(() => {
-    fetch('/api/categories')
+    fetch('/api/categories', { cache: 'no-store' })
       .then((res) => res.json())
       .then((data) => setCategories(data.categories ?? []))
       .catch(() => {})
@@ -73,13 +72,29 @@ export function WriteView({ editMode = false, initialPost }: WriteViewProps) {
       setShowCategoryDropdown(false)
       setIsDirty(true)
       // Refetch categories
-      fetch('/api/categories')
+      fetch('/api/categories', { cache: 'no-store' })
         .then((r) => r.json())
         .then((d) => setCategories(d.categories ?? []))
-      showToast(`'${name}' 카테고리가 추가되었습니다.`)
+      toast.success(`'${name}' 카테고리가 추가되었습니다.`)
     } else {
       const data = await res.json()
-      showToast(data.error ?? '추가 실패', 'error')
+      toast.error(data.error ?? '추가 실패')
+    }
+  }
+
+  const handleDeleteCategory = async (cat: Category, e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!window.confirm(`'${cat.name}' 카테고리를 삭제하시겠습니까?`)) return
+    const res = await fetch(`/api/categories/${cat.id}`, { method: 'DELETE' })
+    if (res.ok) {
+      if (category === cat.name) setCategory('')
+      fetch('/api/categories', { cache: 'no-store' })
+        .then((r) => r.json())
+        .then((d) => setCategories(d.categories ?? []))
+      toast.success(`'${cat.name}' 카테고리가 삭제되었습니다.`)
+    } else {
+      const data = await res.json()
+      toast.error(data.error ?? '삭제 실패')
     }
   }
 
@@ -249,10 +264,10 @@ export function WriteView({ editMode = false, initialPost }: WriteViewProps) {
         if (!editMode) localStorage.removeItem(DRAFT_KEY)
         router.push(published ? `/post/${slug}` : '/')
       } else {
-        showToast('저장에 실패했습니다.', 'error')
+        toast.error('저장에 실패했습니다.')
       }
     } catch {
-      showToast('저장 중 오류가 발생했습니다.', 'error')
+      toast.error('저장 중 오류가 발생했습니다.')
     } finally {
       setSaving(false)
     }
@@ -288,16 +303,24 @@ export function WriteView({ editMode = false, initialPost }: WriteViewProps) {
             {showCategoryDropdown && (
               <div className="absolute left-0 top-full z-10 mt-1 min-w-[180px] rounded-xl border border-border bg-bg py-1 shadow-lg">
                 {categories.map((cat) => (
-                  <button
-                    key={cat.id}
-                    onClick={() => { setCategory(cat.name); setShowCategoryDropdown(false); setIsDirty(true); setIsAddingCategory(false) }}
-                    className={`flex w-full items-center gap-2.5 px-4 py-2 text-left text-[13px] transition-colors hover:bg-bg-card ${
-                      category === cat.name ? 'font-medium text-text-primary' : 'text-text-secondary'
-                    }`}
-                  >
-                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: cat.color }} />
-                    {cat.name}
-                  </button>
+                  <div key={cat.id} className="group flex items-center">
+                    <button
+                      onClick={() => { setCategory(cat.name); setShowCategoryDropdown(false); setIsDirty(true); setIsAddingCategory(false) }}
+                      className={`flex flex-1 items-center gap-2.5 px-4 py-2 text-left text-[13px] transition-colors hover:bg-bg-card ${
+                        category === cat.name ? 'font-medium text-text-primary' : 'text-text-secondary'
+                      }`}
+                    >
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: cat.color }} />
+                      {cat.name}
+                    </button>
+                    <button
+                      onClick={(e) => handleDeleteCategory(cat, e)}
+                      className="mr-2 hidden rounded p-0.5 text-text-muted hover:text-red-500 group-hover:block"
+                      title="삭제"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
                 ))}
 
                 <div className="mx-2 my-1 h-px bg-border" />

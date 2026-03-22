@@ -14,24 +14,10 @@ interface PostDetailProps {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  '개발': '#3B82F6',
-  '일상': '#10B981',
-  '기술': '#8B5CF6',
-  '회고': '#F59E0B',
-}
-
-function parseTags(tags: string | null): string[] {
-  if (!tags) return []
-  try {
-    const parsed = JSON.parse(tags)
-    if (Array.isArray(parsed)) return parsed
-  } catch {
-    // not JSON, treat as comma-separated
-  }
-  return tags
-    .split(',')
-    .map((t) => t.trim())
-    .filter(Boolean)
+  '개발': '#3182f6',
+  '일상': '#20c997',
+  '기술': '#845ef7',
+  '회고': '#fab005',
 }
 
 export function PostDetail({ slug }: PostDetailProps) {
@@ -110,49 +96,33 @@ export function PostDetail({ slug }: PostDetailProps) {
     day: 'numeric',
   })
   const sanitizedContent = sanitizeHtml(post.content)
-  const tags = parseTags(post.tags)
 
   return (
     <div className="min-h-screen bg-bg">
       <BlogHeader />
 
       <div className="mx-auto max-w-[1100px] px-6 py-12">
-        <div className="flex gap-10">
+        <div className="flex gap-0">
           {/* Main Content */}
-          <article className="min-w-0 flex-1 max-w-[760px]">
+          <article className="min-w-0 flex-1">
             {/* Header */}
-            <header className="mb-10">
+            <header className="mb-12">
               {post.category && (
                 <span
-                  className="inline-block rounded-full px-3 py-1 text-[12px] font-semibold text-white"
-                  style={{ backgroundColor: CATEGORY_COLORS[post.category] || '#1a1a1a' }}
+                  className="inline-block rounded-full px-3 py-1 text-[0.75rem] font-semibold text-white"
+                  style={{ backgroundColor: CATEGORY_COLORS[post.category] || '#3182f6' }}
                 >
                   {post.category}
                 </span>
               )}
-              <h1 className="mt-3 text-[2rem] font-bold leading-tight text-text-primary sm:text-[2.5rem]">
+              <h1 className="mt-4 text-[2rem] font-extrabold leading-[1.3] tracking-tight text-text-primary sm:text-[2.5rem]">
                 {post.title}
               </h1>
-              <div className="mt-4 flex items-center gap-2 text-[14px] text-text-muted">
-                <span>한로</span>
+              <div className="mt-5 flex items-center gap-2 text-[0.875rem] text-text-muted">
+                <span className="font-medium text-text-secondary">한로</span>
                 <span>·</span>
                 <time>{date}</time>
-                <span>·</span>
-                <span>조회 {post.views}</span>
               </div>
-
-              {tags.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full bg-bg-card px-2.5 py-0.5 text-[11px] font-medium text-text-muted"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-              )}
 
               <AdminControls slug={slug} />
             </header>
@@ -164,10 +134,10 @@ export function PostDetail({ slug }: PostDetailProps) {
             />
           </article>
 
-          {/* Table of Contents */}
-          <aside className="hidden w-[200px] shrink-0 xl:block">
+          {/* TOC — sticky sidebar */}
+          <aside className="hidden w-[200px] shrink-0 pl-10 xl:block">
             <div className="sticky top-[80px]">
-              <TableOfContents content={sanitizedContent} />
+              <TableOfContents />
             </div>
           </aside>
         </div>

@@ -1,10 +1,7 @@
 import type { Metadata } from 'next'
-import { ToastProvider } from '@/components/ToastProvider'
+import { Toaster } from 'sonner'
+import { QueryProvider } from '@/components/QueryProvider'
 import '@/index.css'
-import { Geist } from "next/font/google";
-import { cn } from "@/lib/utils";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: '한로 블로그',
@@ -37,7 +34,7 @@ export default function RootLayout({
   readonly children: React.ReactNode
 }) {
   return (
-    <html lang="ko" className={cn("font-sans", geist.variable)}>
+    <html lang="ko">
       <head>
         <link
           rel="stylesheet"
@@ -47,11 +44,12 @@ export default function RootLayout({
         <link rel="alternate" type="application/rss+xml" title="한로 블로그 RSS" href="/feed.xml" />
       </head>
       <body>
-        <ToastProvider>
-          <div className="flex min-h-screen flex-col">
-            {children}
-          </div>
-        </ToastProvider>
+        <QueryProvider>
+            <div className="flex min-h-screen flex-col">
+              {children}
+            </div>
+            <Toaster position="bottom-right" richColors />
+        </QueryProvider>
       </body>
     </html>
   )

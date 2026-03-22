@@ -28,16 +28,17 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     params.push(term, term)
   }
 
-  const countResult = await queryD1<{ cnt: number }>(
-    `SELECT COUNT(*) as cnt FROM posts ${whereClauses}`,
-    params
-  )
+  const [countResult, posts] = await Promise.all([
+    queryD1<{ cnt: number }>(
+      `SELECT COUNT(*) as cnt FROM posts ${whereClauses}`,
+      params
+    ),
+    queryD1<PostListItem>(
+      `SELECT id, title, slug, thumbnail, category, tags, published, views, excerpt, created_at FROM posts ${whereClauses} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+      [...params, limit, offset]
+    ),
+  ])
   const totalCount = countResult[0]?.cnt ?? 0
-
-  const posts = await queryD1<PostListItem>(
-    `SELECT id, title, slug, thumbnail, category, tags, published, views, excerpt, created_at FROM posts ${whereClauses} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-    [...params, limit, offset]
-  )
 
   const response = NextResponse.json({
     posts,

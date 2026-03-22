@@ -13,14 +13,14 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     const token = request.cookies.get('hanro_token')?.value
 
     if (!token) {
-      response = NextResponse.redirect(new URL('/login', request.url))
+      response = NextResponse.redirect(new URL('/admin/login', request.url))
     } else {
       try {
         const secret = new TextEncoder().encode(process.env.JWT_SECRET)
         await jwtVerify(token, secret)
         response = NextResponse.next()
       } catch {
-        response = NextResponse.redirect(new URL('/login', request.url))
+        response = NextResponse.redirect(new URL('/admin/login', request.url))
       }
     }
   } else {

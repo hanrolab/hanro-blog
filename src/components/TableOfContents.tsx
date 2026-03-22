@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface TocItem {
   id: string
@@ -8,40 +8,40 @@ interface TocItem {
   level: number
 }
 
-interface TableOfContentsProps {
-  content: string
-}
-
-export function TableOfContents({ content }: TableOfContentsProps) {
+export function TableOfContents() {
+  const [headings, setHeadings] = useState<TocItem[]>([])
   const [activeId, setActiveId] = useState('')
 
-  const headings = useMemo(() => {
-    const items: TocItem[] = []
-    const regex = /<h([12])[^>]*(?:id="([^"]*)")?[^>]*>(.*?)<\/h[12]>/gi
-    let match
+  useEffect(() => {
+    const postContent = document.querySelector('.post-content')
+    if (!postContent) return
 
+    const domHeadings = postContent.querySelectorAll('h1, h2, h3')
+    const items: TocItem[] = []
     const usedIds = new Set<string>()
-    while ((match = regex.exec(content)) !== null) {
-      const level = parseInt(match[1])
-      const text = match[3].replace(/<[^>]*>/g, '').trim()
-      let id = match[2] || text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '') || `heading-${items.length}`
-      // Deduplicate IDs
+
+    domHeadings.forEach((el, index) => {
+      const level = parseInt(el.tagName[1])
+      const text = el.textContent?.trim() || ''
+      let id =
+        text
+          .toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^\w가-힣-]/g, '') || `heading-${index}`
+
       if (usedIds.has(id)) {
         let i = 2
         while (usedIds.has(`${id}-${i}`)) i++
         id = `${id}-${i}`
       }
       usedIds.add(id)
+      el.id = id
       items.push({ id, text, level })
-    }
+    })
 
-    return items
-  }, [content])
+    setHeadings(items)
 
-  // IntersectionObserver for active heading
-  useEffect(() => {
-    if (headings.length === 0) return
-
+    // Observe for active heading
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -53,47 +53,42 @@ export function TableOfContents({ content }: TableOfContentsProps) {
       { rootMargin: '-80px 0px -70% 0px', threshold: 0 }
     )
 
-    // Add IDs to headings in the DOM if missing
-    const postContent = document.querySelector('.post-content')
-    if (postContent) {
-      const domHeadings = postContent.querySelectorAll('h1, h2')
-      domHeadings.forEach((el) => {
-        if (!el.id) {
-          el.id = el.textContent?.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '') || ''
-        }
-        observer.observe(el)
-      })
-    }
+    domHeadings.forEach((el) => observer.observe(el))
 
     return () => observer.disconnect()
-  }, [headings])
+  }, [])
 
   if (headings.length === 0) return null
 
   return (
-    <nav className="space-y-1">
-      <p className="mb-3 text-[12px] font-bold uppercase tracking-wider text-text-muted">
-        목차
-      </p>
-      {headings.map((item) => (
-        <a
-          key={item.id}
-          href={`#${item.id}`}
-          className={`block text-[13px] leading-relaxed transition-colors ${
-            item.level === 2 ? 'pl-3' : ''
-          } ${
-            activeId === item.id
-              ? 'text-text-primary font-medium'
-              : 'text-text-muted hover:text-text-primary'
-          }`}
-          onClick={(e) => {
-            e.preventDefault()
-            document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' })
-          }}
-        >
-          {item.text}
-        </a>
-      ))}
+    <nav className="relative border-l-2 border-border pl-4">
+      {headings.map((item) => {
+        const isActive = activeId === item.id
+        return (
+          <div key={item.id} className="relative">
+            {isActive && (
+              <div className="absolute -left-[calc(1rem+2px)] top-0 h-full w-[2px] bg-text-primary" />
+            )}
+            <a
+              href={`#${item.id}`}
+              className={`block truncate text-[0.8125rem] leading-7 transition-colors ${
+                item.level === 2 ? 'pl-3' : item.level === 3 ? 'pl-6' : ''
+              } ${
+                isActive
+                  ? 'font-medium text-text-primary'
+                  : 'text-text-muted hover:text-text-primary'
+              }`}
+              title={item.text}
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' })
+              }}
+            >
+              {item.text}
+            </a>
+          </div>
+        )
+      })}
     </nav>
   )
 }

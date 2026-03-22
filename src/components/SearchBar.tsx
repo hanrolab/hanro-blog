@@ -26,16 +26,16 @@ export function SearchBar({ onSearch }: SearchBarProps) {
   )
 
   return (
-    <div className="relative w-[200px]">
-      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
+    <div className="relative w-[220px]">
+      <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
       <input
         type="text"
         onChange={handleChange}
         placeholder="검색어를 입력하세요"
-        className="w-full rounded-md border border-border bg-bg py-1.5 pl-8 pr-8 text-[13px] text-text-primary outline-none transition-colors placeholder:text-text-muted/50 focus:border-text-muted"
+        className="w-full rounded-xl border border-border bg-bg-card/40 py-2 pl-9 pr-9 text-[0.8125rem] text-text-primary outline-none transition-all placeholder:text-text-muted/60 focus:border-accent/30 focus:bg-bg focus:shadow-sm"
       />
       {searching && (
-        <div className="absolute right-2.5 top-1/2 -translate-y-1/2">
+        <div className="absolute right-3 top-1/2 -translate-y-1/2">
           <Spinner size="sm" />
         </div>
       )}

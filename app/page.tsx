@@ -1,5 +1,10 @@
+import { Suspense } from 'react'
 import { Blog } from '@/views/Blog'
 
 export default function BlogPage() {
-  return <Blog />
+  return (
+    <Suspense>
+      <Blog />
+    </Suspense>
+  )
 }
