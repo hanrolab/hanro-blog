@@ -14,30 +14,30 @@ const education = [
 
 const career = [
   {
-    period: '2026 -Present',
+    period: '2026 — 재직중',
     title: 'B3D',
     desc: '패션/원단 회사 ERP·PLM 시스템 AI 자동화 도입 및 JSP 레거시 마이그레이션',
     tag: 'Full-Stack Developer',
     image: '🏢',
   },
   {
-    period: '2026 -Present',
+    period: '2026 — 운영중',
     title: 'Readip',
     desc: '영어 원서 번역 앱 iOS/Android 운영 중',
     tag: 'Founder & Developer',
     image: '📖',
   },
   {
-    period: '2025.03 -2026.03',
+    period: '2025.03 — 2026.03',
     title: '멍냥로그',
     desc: '반려동물 앱 -사업자 등록 후 투자 유치 시도, 카페 병행 운영',
     tag: 'Founder',
     image: '🐾',
   },
   {
-    period: '2025.03 -2026.02',
+    period: '2025.03 — 2026.02',
     title: '샬로우커피',
-    desc: '카페 사장대리 -직원 약 10명 규모, 연매출 1억원',
+    desc: '카페 사장대리 -직원 약 10명 규모, 연매출 1억원 (근무 기간 중 최저·최고 매출 달성)',
     tag: '사장대리',
     image: '☕',
   },
@@ -54,31 +54,23 @@ const skills = [
   { name: 'AI', color: '#FF6F00', icon: RiRobot2Fill },
 ] as const
 
-const sectionColors: Record<string, string> = {
-  '학력 사항': '#3B82F6',
-  '경력 사항': '#111111',
-  '자격증 / 수료증': '#D97757',
-  'SKILLS': '#10B981',
-}
-
 function SectionTitle({ children }: { children: string }) {
-  const color = sectionColors[children] || '#111111'
   return (
-    <div className="mb-3 flex items-center gap-3">
-      <span className="h-5 w-[3px] rounded-full" style={{ backgroundColor: color }} />
-      <h3 className="text-[15px] font-bold text-text-primary">{children}</h3>
+    <div className="mb-6">
+      <h3 className="text-[1.125rem] font-bold text-text-primary">{children}</h3>
+      <div className="mt-3 h-px bg-border" />
     </div>
   )
 }
 
 function PeriodLabel({ period }: { period: string }) {
-  const isActive = period.includes('Present')
+  const isActive = period.includes('재직중') || period.includes('운영중')
   return (
-    <span className="flex w-[140px] shrink-0 items-center gap-2 whitespace-nowrap">
-      <span className={`h-1.5 w-1.5 rounded-full ${isActive ? 'bg-blue-500' : 'bg-border'}`} />
-      <span className="text-[14px] text-text-muted">
+    <span className="flex w-[150px] shrink-0 items-center gap-2.5 whitespace-nowrap">
+      <span className={`h-2 w-2 rounded-full ${period.includes('재직중') ? 'bg-[#3182f6]' : period.includes('운영중') ? 'bg-[#20c997]' : 'bg-border'}`} />
+      <span className="text-[0.9375rem] text-text-muted">
         {isActive
-          ? <>{period.replace('Present', '')}<span className="font-semibold text-blue-500">Present</span></>
+          ? <>{period.replace(/재직중|운영중/, '')}<span className={`font-bold ${period.includes('재직중') ? 'text-[#3182f6]' : 'text-[#20c997]'}`}>{period.match(/재직중|운영중/)?.[0]}</span></>
           : period
         }
       </span>
@@ -91,8 +83,8 @@ function InfoList({ items }: { items: readonly { period: string; desc: string }[
     <div className="space-y-4">
       {items.map((item) => (
         <div key={item.period + item.desc} className="flex gap-6">
-          <PeriodLabel period={item.period} />
-          <span className="text-[15px] leading-[1.6] text-text-secondary">{item.desc}</span>
+          <span className="w-[150px] shrink-0 text-[0.9375rem] text-text-muted whitespace-nowrap">{item.period}</span>
+          <span className="text-[1rem] leading-[1.7] text-text-secondary">{item.desc}</span>
         </div>
       ))}
     </div>
@@ -107,6 +99,14 @@ const allCerts = [
   { period: '2025.10', desc: 'Kotlin for Backend Development', org: 'JetBrains' },
 ] as const
 
+const ORG_COLORS: Record<string, string> = {
+  'Anthropic': '#CC785C',
+  'Google': '#4285F4',
+  'Udemy': '#A435F0',
+  'JetBrains': '#087CFA',
+}
+function orgColor(org: string): string { return ORG_COLORS[org] ?? '#3182f6' }
+
 function CertSection() {
   const [showAll, setShowAll] = useState(false)
   const visible = showAll ? allCerts : allCerts.slice(0, 2)
@@ -117,11 +117,11 @@ function CertSection() {
       <div className="space-y-3">
         {visible.map((cert) => (
           <div key={cert.desc} className="flex gap-6">
-            <span className="w-[140px] shrink-0 text-[14px] text-text-muted whitespace-nowrap">{cert.period}</span>
+            <span className="w-[150px] shrink-0 text-[0.9375rem] text-text-muted whitespace-nowrap">{cert.period}</span>
             <div>
-              <span className="text-[15px] leading-[1.6] text-text-secondary">{cert.desc}</span>
-              <span className="ml-2 text-[13px] text-text-muted">-</span>
-              <span className="ml-1 text-[13px] font-medium" style={{ color: '#D97757' }}>{cert.org}</span>
+              <span className="text-[1rem] leading-[1.7] text-text-secondary">{cert.desc}</span>
+              <span className="ml-2 text-[0.875rem] text-text-muted">·</span>
+              <span className="ml-1 text-[0.9375rem] font-medium" style={{ color: orgColor(cert.org) }}>{cert.org}</span>
             </div>
           </div>
         ))}
@@ -155,7 +155,7 @@ function ScrollHint() {
   )
 }
 
-const pageLabels = ['INTRO', 'EXPERTISE', 'PROJECTS', 'CONTACT'] as const
+const pageLabels = ['INTRO', 'PROJECTS', 'CONTACT'] as const
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false)
@@ -279,18 +279,22 @@ export function Home() {
   return (
     <>
     {/* Page indicator */}
-    <nav className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 hidden md:flex items-center gap-2 rounded-full border border-border/60 bg-bg/80 px-4 py-2.5 backdrop-blur-md shadow-sm">
+    <nav className="glass-nav fixed bottom-8 left-1/2 z-50 -translate-x-1/2 hidden md:flex items-center gap-1 rounded-2xl p-1.5">
       {pageLabels.map((label, i) => (
         <button
           key={label}
           onClick={() => goToPage(i)}
-          className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium tracking-[0.05em] transition-all ${
-            currentPage === i
-              ? 'bg-text-primary text-bg'
-              : 'text-text-muted hover:text-text-primary'
-          }`}
+          className="relative rounded-xl px-5 py-2.5 text-[0.75rem] font-semibold tracking-[0.04em] transition-colors duration-200"
+          style={{ color: currentPage === i ? '#fff' : '#4e5968' }}
         >
-          {label}
+          {currentPage === i && (
+            <motion.div
+              layoutId="nav-active"
+              className="absolute inset-0 rounded-xl bg-[#191f28]"
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+            />
+          )}
+          <span className="relative z-10">{label}</span>
         </button>
       ))}
     </nav>
@@ -301,7 +305,7 @@ export function Home() {
     }>
 
       {/* ===== PAGE 1: INTRO ===== */}
-      <section data-page data-scroll-y className="relative min-h-screen md:h-screen snap-start shrink-0 md:w-screen px-6 py-10 pb-24 md:py-12 md:pb-24 md:px-12 md:overflow-y-auto">
+      <section data-page data-scroll-y className="relative min-h-screen md:h-screen snap-start shrink-0 md:w-screen px-6 py-10 pb-40 md:py-12 md:pb-40 md:px-12 md:overflow-y-auto">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 lg:flex-row lg:gap-12">
           {/* Left */}
           <motion.div
@@ -323,10 +327,8 @@ export function Home() {
               <span className="font-serif text-[34px] md:text-[40px]">주진성입니다.</span>
             </div>
 
-            <div className="mt-8 aspect-[4/5] w-full max-w-[240px] overflow-hidden rounded-2xl bg-bg-card">
-              <div className="flex h-full items-center justify-center">
-                <span className="text-[13px] tracking-[0.15em] text-text-muted">PHOTO</span>
-              </div>
+            <div className="mt-8 aspect-[4/5] w-full max-w-[240px] overflow-hidden rounded-2xl">
+              <img src="/profile.jpeg" alt="주진성" className="h-full w-full object-cover" />
             </div>
           </motion.div>
 
@@ -336,7 +338,7 @@ export function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.12 }}
-            className="flex-1 divide-y divide-border [&>div]:py-5 [&>div:first-child]:pt-0"
+            className="flex-1 space-y-8"
           >
             <div>
               <SectionTitle>학력 사항</SectionTitle>
@@ -344,13 +346,18 @@ export function Home() {
             </div>
             <div>
               <SectionTitle>경력 사항</SectionTitle>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {career.map((item) => (
                   <div key={item.title} className="flex gap-6">
-                    <PeriodLabel period={item.period} />
+                    <h4 className="w-[100px] shrink-0 text-[1.125rem] font-bold text-text-primary">{item.title}</h4>
                     <div>
-                      <span className="text-[16px] font-bold text-text-primary">{item.title}</span>
-                      <p className="mt-0.5 text-[15px] leading-[1.5] text-text-secondary">{item.desc}</p>
+                      <p className="text-[0.9375rem] leading-[1.7] text-text-primary">{item.desc}</p>
+                      <p className="mt-1 text-[0.8125rem] text-text-muted">
+                        {item.period.includes('재직중') || item.period.includes('운영중')
+                          ? <><span className="text-text-primary">{item.period.replace(/재직중|운영중/, '')}</span><span className={`font-semibold ${item.period.includes('재직중') ? 'text-[#3182f6]' : 'text-[#20c997]'}`}>{item.period.match(/재직중|운영중/)?.[0]}</span></>
+                          : item.period
+                        }
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -359,7 +366,7 @@ export function Home() {
             <CertSection />
             <div>
               <SectionTitle>SKILLS</SectionTitle>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap justify-center gap-5">
                 {skills.map((skill) => {
                   const Icon = skill.icon
                   return (
@@ -370,7 +377,7 @@ export function Home() {
                       >
                         <Icon className="h-5 w-5" />
                       </div>
-                      <span className="text-[12px] text-text-muted">{skill.name}</span>
+                      <span className="text-[0.8125rem] text-text-muted">{skill.name}</span>
                     </div>
                   )
                 })}
@@ -381,42 +388,7 @@ export function Home() {
         <ScrollHint />
       </section>
 
-      {/* ===== PAGE 2: CORE EXPERTISE ===== */}
-      <section data-page className="relative flex min-h-screen md:h-screen snap-start shrink-0 md:w-screen items-center border-t border-border px-6 py-16 md:py-0 md:px-12">
-        <div className="mx-auto w-full max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="mb-16 text-[13px] font-semibold tracking-[0.2em] text-text-muted">CORE EXPERTISE</h2>
-            <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                { num: '01', title: 'Backend', desc: 'Spring Boot, Kotlin, Java, JPA, QueryDSL 기반의 확장 가능한 서버 아키텍처 설계' },
-                { num: '02', title: 'Frontend', desc: 'React, TypeScript, Tailwind CSS, Zustand를 활용한 반응형 SPA 개발' },
-                { num: '03', title: 'Database', desc: 'PostgreSQL, Redis, MinIO, Docker 기반 데이터 계층 및 인프라 구축' },
-                { num: '04', title: 'AI', desc: 'Gemini AI, Spring AI를 활용한 자연어 처리 및 AI 기능 통합' },
-              ].map((item, i) => (
-                <motion.div
-                  key={item.num}
-                  initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
-                >
-                  <span className="text-[13px] text-text-muted">{item.num}</span>
-                  <h3 className="mt-4 font-serif text-[1.5rem] text-text-primary">{item.title}</h3>
-                  <p className="mt-3 text-[15px] leading-[1.75] text-text-secondary">{item.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-        <ScrollHint />
-      </section>
-
-      {/* ===== PAGE 3: PROJECTS ===== */}
+      {/* ===== PAGE 2: PROJECTS ===== */}
       <section id="projects" data-page data-scroll-y className="min-h-screen md:h-screen snap-start shrink-0 md:w-screen px-6 pt-3 pb-24 md:px-12 md:pt-3 md:pb-24 md:overflow-y-auto">
         <div className="mx-auto w-full max-w-6xl">
           <div className="mb-6 flex justify-end">
@@ -430,7 +402,7 @@ export function Home() {
         </div>
       </section>
 
-      {/* ===== PAGE 4: CONTACT ===== */}
+      {/* ===== PAGE 3: CONTACT ===== */}
       <section data-page className="relative flex min-h-screen md:h-screen snap-start shrink-0 md:w-screen items-center px-6 py-16 md:py-0 md:px-12">
         <div className="mx-auto w-full max-w-3xl text-center">
           <motion.div
@@ -439,41 +411,33 @@ export function Home() {
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
           >
-            <p className="font-serif text-[clamp(2.2rem,5vw,4rem)] leading-[1.2] text-text-primary">
-              함께 일하고 싶으시다면<span className="italic text-text-muted">.</span>
-            </p>
-
-            <p className="mt-6 text-[16px] leading-[1.8] text-text-secondary">
-              새로운 프로젝트, 기술 서적 집필, 또는 협업에 대해<br />
-              편하게 연락주세요.
+            <p className="text-[clamp(1.5rem,4vw,2.5rem)] font-bold leading-[1.4] text-text-primary">
+              누군가에게 도움이 되는<br />기술을 만들고 싶습니다.
             </p>
 
             {/* Social Links */}
             <div className="mt-14 flex justify-center gap-5">
               {[
-                { icon: Mail, label: 'Email', href: 'mailto:contact@example.com' },
-                { icon: Github, label: 'GitHub', href: 'https://github.com/Joojinsung1017' },
-                { icon: Instagram, label: 'Instagram', href: 'https://instagram.com' },
-                { icon: Linkedin, label: 'LinkedIn', href: 'https://linkedin.com' },
+                { icon: Github, href: 'https://github.com/Joojinsung1017', color: '#24292e' },
+                { icon: Instagram, href: 'https://www.instagram.com/j_m101707/', color: '#E1306C' },
+                { icon: Linkedin, href: 'https://www.linkedin.com/in/dev-jinsung', color: '#0A66C2' },
               ].map((link) => (
                 <a
-                  key={link.label}
+                  key={link.href}
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex flex-col items-center gap-2"
+                  className="flex h-14 w-14 items-center justify-center rounded-full bg-bg-card transition-all hover:scale-110 hover:opacity-80"
+                  style={{ color: link.color }}
                 >
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full border border-border text-text-muted transition-all duration-300 hover:border-text-primary hover:bg-text-primary hover:text-bg">
-                    <link.icon className="h-5 w-5" />
-                  </div>
-                  <span className="text-[12px] text-text-muted group-hover:text-text-primary transition-colors">{link.label}</span>
+                  <link.icon className="h-6 w-6" />
                 </a>
               ))}
             </div>
 
-            {/* Copyright */}
-            <p className="mt-20 text-[13px] text-text-muted">
-              &copy; {new Date().getFullYear()} Jinsung Joo
+            {/* Email */}
+            <p className="mt-10 text-[0.9375rem] tracking-wide text-text-muted">
+              dev.jinsung1017@gmail.com
             </p>
           </motion.div>
         </div>
