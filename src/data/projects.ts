@@ -115,7 +115,7 @@ export const projects: readonly Project[] = [
     title: 'Realm',
     subtitle: 'Workspace Productivity & Collaboration Platform',
     description:
-      '칸반 보드, 문서 협업, 화이트보드, ERD 다이어그램, 시맨틱 검색을 통합한 워크스페이스 기반 생산성 플랫폼. Tauri 데스크톱 앱과 웹을 동시 지원하며, 18개 도메인 테이블과 pgvector 기반 AI 검색을 갖춤.',
+      '문서, 드라이브, 캘린더 등 여러 SaaS를 사용하면서 데이터를 많이 다루는데, 매번 유료 구독하는 게 아까워서 직접 만든 올인원 워크스페이스입니다. 칸반 보드, 문서 편집기, 화이트보드, ERD 다이어그램, 캘린더, 대시보드를 하나의 플랫폼에 통합했고, Tauri 데스크톱 앱과 웹을 동시 지원합니다.',
     role: 'Full-Stack Developer',
     year: '2026 —',
     techStack: [
@@ -125,7 +125,6 @@ export const projects: readonly Project[] = [
       'Kotlin',
       'Spring Boot 3',
       'PostgreSQL',
-      'pgvector',
       'Cloudflare R2',
       'TipTap',
       'tldraw',
@@ -133,7 +132,7 @@ export const projects: readonly Project[] = [
     highlights: [
       '칸반/간트/캘린더/리스트 4가지 보드 뷰',
       'TipTap 리치 텍스트 + tldraw 화이트보드 통합',
-      'pgvector + Cloudflare AI 시맨틱 검색',
+      '통합 검색 시스템',
       'Tauri 크로스플랫폼 데스크톱 앱 (macOS, Windows, Linux)',
       'Google OAuth2 + JWT 인증 (Access 15분, Refresh 7일)',
       'R2 Presigned URL 파일 업로드',
@@ -147,12 +146,15 @@ export const projects: readonly Project[] = [
     techDetail: {
       frontend: ['React 19', 'TypeScript', 'Vite', 'Tailwind CSS', 'shadcn/ui', 'Zustand', 'React Query', 'TipTap', 'tldraw', 'dnd-kit'],
       backend: ['Kotlin', 'Spring Boot 3', 'Spring Security', 'JPA', 'QueryDSL', 'JWT'],
-      infra: ['PostgreSQL + pgvector', 'Cloudflare R2', 'Cloudflare AI', 'GCP Cloud Run', 'Docker', 'Tauri'],
+      infra: ['PostgreSQL', 'Cloudflare R2', 'GCP Cloud Run', 'Docker', 'Tauri'],
     },
     mockupType: 'web',
     accent: '#8b5cf6',
     images: {
-      desktop: '/images/realm-desktop.png',
+      hero: '/images/realm-docs.png',
+      desktop: '/images/realm-hero.png',
+      tablet: '/images/realm-calendar.png',
+      mobile: '/images/realm-erd.png',
     },
   },
   {

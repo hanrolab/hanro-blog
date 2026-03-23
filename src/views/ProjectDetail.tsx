@@ -8,8 +8,8 @@ import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
 import { projects } from '@/data/projects'
 import { skillIconMap } from '@/data/skillIcons'
 
-function ChapterToggle({ num, title, count, children }: { num: string; title: string; count: number; children: React.ReactNode }) {
-  const [open, setOpen] = useState(false)
+function ChapterToggle({ num, title, count, children, defaultOpen = false }: { num: string; title: string; count: number; children: React.ReactNode; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen)
 
   return (
     <div className="border-b border-border">
@@ -48,8 +48,22 @@ interface ToggleItem {
   readonly content: string
 }
 
-function ItemToggleList({ items }: { items: readonly ToggleItem[] }) {
+function ItemToggleList({ items, accent }: { items: readonly ToggleItem[]; accent?: string }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const allSimple = items.every((item) => !item.content)
+
+  if (allSimple) {
+    return (
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {items.map((item, i) => (
+          <div key={i} className="flex items-start gap-3 rounded-xl border border-border/50 bg-bg-card/40 px-5 py-4 transition-colors hover:bg-bg-card">
+            <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: accent || '#8b5cf6' }} />
+            <span className="text-[15px] leading-[1.6] text-text-primary">{item.title}</span>
+          </div>
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-1">
@@ -59,13 +73,13 @@ function ItemToggleList({ items }: { items: readonly ToggleItem[] }) {
             onClick={() => setOpenIndex(openIndex === i ? null : i)}
             className="flex w-full items-center gap-4 px-4 py-4 text-left"
           >
-            <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors duration-200 ${openIndex === i ? 'bg-text-primary' : 'bg-bg-card'}`}>
-              <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${openIndex === i ? 'rotate-180 text-bg' : 'text-text-muted'}`} />
+            <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors duration-200 ${openIndex === i ? 'bg-text-primary' : 'bg-text-muted/30'}`}>
+              <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${openIndex === i ? 'rotate-180 text-bg' : 'text-text-secondary'}`} />
             </div>
             <span className="text-[17px] leading-[1.6] text-text-primary">{item.title}</span>
           </button>
           <AnimatePresence>
-            {openIndex === i && (
+            {openIndex === i && item.content && (
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
@@ -115,26 +129,23 @@ const highlightContentData: Record<string, Record<string, string>> = {
     'FCM 푸시 알림 + 딥링크 네비게이션': 'Spring Boot + Firebase Admin SDK로 가족 그룹 가입, 게시글 작성, 산책 완료, 결제 완료 등의 이벤트에 푸시 알림을 발송합니다. 알림 카테고리별 ON/OFF 설정을 제공하며, 포그라운드에서도 상단에 알림이 표시됩니다.\n\n푸시 토큰은 FCM 특성상 계속 변경되기 때문에, 로그인 성공 시와 자동 로그인(스플래시) 시 두 시점에서 토큰을 업데이트합니다. 로그인 시에는 클라이언트에서 서버로 토큰을 전송하는 타이밍에 저장하고, 자동 로그인 시에는 스플래시 단계에서 갱신합니다.\n\n가장 어려웠던 점은 데이터 정합성이었습니다. 가족 초대 알림을 포그라운드에서 눌러 진입했는데 가족 그룹 정보가 보이지 않는 문제가 있었고, 원인은 클라이언트 캐시였습니다. 이후 캐시 초기화 공통 유틸 함수를 만들어 알림 진입 시 항상 최신 데이터를 조회하도록 개선했습니다.',
     'Spring AI Function Calling 기반 AI 펫 상담사': 'Gemini 2.5 Flash 모델을 활용한 AI 펫 상담사입니다. 반려동물을 선택하면 산책 기록, 건강검진 이력, 예방접종 일정, 병원 스케줄 등 해당 반려동물의 전체 데이터를 기반으로 자연어 질의응답이 가능합니다.\n\nSpring AI Function Calling으로 건강검진별, 산책별, 권한별 등 카테고리별 프롬프트를 세분화하여 응답 정확도를 높였습니다.\n\n가장 어려웠던 점은 서버 데이터가 필요 없는 일반 질문에서 AI 응답 품질이 떨어지는 문제였습니다. 서버에서 동일한 Function Calling을 반복 호출하면서 불필요한 응답을 생성했기 때문입니다. 이를 해결하기 위해 클라이언트에도 같은 모델을 탑재하고, 질문이 서버 데이터가 필요한지 클라이언트에서 먼저 판별하도록 했습니다. 서버 데이터가 불필요하면 클라이언트에서 바로 응답하고, 필요하면 서버 API를 호출하는 2단계 구조로 개선하여 응답 속도와 품질을 모두 높였습니다.',
     '가족 범위 게시글 공유 (사진/미디어, 펫 태깅)': '가족 구성원만 볼 수 있는 게시글 피드입니다. 사진과 텍스트를 올릴 수 있으며, 산책 완료 시 산책 경로가 자동으로 게시글에 업로드됩니다. 반려동물을 다중 태깅할 수 있어 펫별로 기록을 모아볼 수 있고, 무한 스크롤로 피드를 탐색합니다.\n\n어려웠던 점은 탈퇴 유저의 게시글 처리였습니다. 회원 탈퇴 시 게시글을 soft delete하면 대량 업데이트가 필요했기 때문에, 게시글 조회 시점에 탈퇴 유저를 필터링하는 방식으로 처리했습니다. 가족 그룹 탈퇴 시에는 그룹 소속이 아니므로 자연스럽게 조회 대상에서 제외됩니다.',
-    '사업자 등록 후 투자 유치 시도': '사업자 등록을 완료하고 프라이머 배치 28기에 지원하여 투자 유치를 시도했습니다. IR 덱 작성, 사업 모델 설계, 시장 분석 등 창업 전반의 과정을 직접 경험했습니다.',
-    '카페 운영과 병행하며 1인 개발': '카페를 운영하면서 기획, 디자인, 개발, 사업을 혼자 진행했습니다. 제한된 시간 안에서 우선순위를 정하고 MVP를 빠르게 구현하는 경험을 했습니다.',
+    '사업자 등록 후 투자 유치 시도': '사업자 등록을 완료하고 프라이머 배치 28기에 지원하여 투자 유치를 시도했습니다.\n\nIR 덱의 핵심 메시지는 "가족 공유를 통한 유대감 증진"이었고, 수익 모델은 AI 펫 상담사, AI 건강 집계 리포트 등 AI 기반 프리미엄 구독과 반려식품 커머스를 설계했습니다. 반려식품은 외부 업체와 실제 생산 계획을 수립하고 샘플까지 제작·수령하는 단계까지 진행했습니다.\n\n결과적으로 프라이머 배치 28기는 불합격했지만, 이 과정에서 가장 크게 배운 것은 "포기도 큰 용기가 필요하다"는 것이었습니다. 주변에서는 포기를 나쁜 것처럼 말하지만, 적절한 포기가 오히려 나를 지키는 길이고, 그 과정에서 무언가를 얻었다면 그것만으로도 충분히 의미 있는 경험이라고 느꼈습니다.\n\n처음에는 포기했다고 생각했지만, 지금 돌아보면 IR 덱 작성, 사업 모델 설계, 시장 분석 등 창업 전반의 경험이 개발자로서의 시야를 넓혀주었고, 무엇보다 미래에 후회하지 않을 선택을 했다는 것이 가장 큰 배움이었습니다.',
+    '카페 운영과 병행하며 1인 개발': '약 1년간 카페를 운영하면서 기획, 디자인, 개발, 사업을 혼자 진행했습니다. 카페 업무를 마치고 평일·주말 남는 시간을 전부 개발에 투자했습니다.\n\n카페를 선택한 이유는 사장 업무를 미리 경험할 수 있는 기회라고 생각했기 때문입니다. 단순 아르바이트가 아니라 직원 관리, 스케줄 관리, 발주 관리 등 운영 전반을 직접 담당했고, 멍냥로그가 잘 되어 대표가 되었을 때를 대비해 미리 경영 감각을 쌓아두자는 마음으로 임했습니다.\n\n디자인은 처음에 외주를 맡겼지만 결과물이 만족스럽지 않아 Figma를 직접 배워서 작업했습니다.\n\n1인 개발에서 가장 힘들었던 점은 방향을 모른다는 것이었습니다. 피드백을 줄 사람이 없어서 내가 가는 방향이 맞는지 확신이 없었고, 기능 하나를 추가하는 데도 정말 많이 고민했습니다. 막상 추가하고 나중에 돌아보면 항상 아쉬운 점이 보였고, 그럴 때는 주변에 반려동물을 키우는 사람들에게 적극적으로 조언을 구하며 방향을 잡아갔습니다.',
   },
 }
 
 const troubleshootingData: Record<string, readonly ToggleItem[]> = {
   'realm': [
-    { title: 'TipTap 문서 자동 저장 실패 — debounce + 낙관적 업데이트로 해결', content: '문서 편집 중 내용이 간헐적으로 저장되지 않는 문제 발생. 원인은 빠른 타이핑 시 API 요청이 race condition을 일으키는 것이었습니다. Zustand에 debounce된 저장 로직과 낙관적 업데이트 패턴을 적용하여 해결했습니다.' },
-    { title: 'Tauri + Vite HMR 포트 충돌 — 환경 분기 설정', content: 'Tauri 개발 환경에서 Vite HMR WebSocket이 충돌하며 핫 리로드가 동작하지 않는 문제. tauri.conf.json에서 devUrl과 Vite 설정을 환경별로 분기 처리하여 해결했습니다.' },
-    { title: 'pgvector 유사도 검색 성능 저하 — IVFFlat 인덱스 적용', content: '데이터가 늘어나면서 시맨틱 검색 응답이 2초 이상 걸리는 문제. IVFFlat 인덱스를 생성하고 probes 값을 튜닝하여 200ms 이내로 개선했습니다.' },
-    { title: 'R2 Presigned URL CORS 에러 — Cloudflare Workers로 프록시', content: '브라우저에서 R2 Presigned URL로 직접 업로드 시 CORS 에러 발생. Cloudflare Workers를 프록시로 두어 CORS 헤더를 제어하고 파일 검증 로직도 추가했습니다.' },
+    { title: 'DB 연결 끊김 — HikariCP keepalive + 프론트 heartbeat 다층 방어', content: 'Cloudtype에 호스팅한 PostgreSQL이 일정 시간이 지나면 연결이 조용히 끊기는 문제가 발생했습니다. 데이터가 저장되지 않는데 에러 메시지도 없어서 원인을 찾기까지 시간이 걸렸습니다.\n\n서버 측에서는 HikariCP keepalive-time을 2분으로 설정하여 연결 유효성을 주기적으로 체크하고, connection-timeout, validation-timeout, max-lifetime, idle-timeout을 세밀하게 조정했습니다.\n\n프론트 측에서는 /auth/health 헬스체크 엔드포인트를 추가하고, 2분 주기 heartbeat로 서버 상태를 사전 감지하는 connectionStore를 구현했습니다. authFetch에 15초 timeout과 5xx 응답 시 자동 재시도 로직도 추가하여 다층으로 방어했습니다.' },
+    { title: '오프라인 감지 + 저장 실패 복구 — draft 백업 + 재시도 큐', content: 'DB 연결 끊김 문제를 겪으면서, 네트워크 불안정 상황에서의 데이터 유실을 근본적으로 방어해야겠다고 판단했습니다.\n\nconnectionStore로 online/offline 상태를 감지하고, 저장에 실패한 요청을 큐에 쌓아 네트워크 복구 시 자동 재전송하는 구조를 만들었습니다. draftStore를 통해 localStorage에 문서 내용을 실시간 백업하여, 브라우저가 꺼져도 마지막 작성 내용을 복원할 수 있습니다.\n\nauthFetch에는 네트워크 에러 시 최대 3회 exponential backoff 재시도를 적용했고, 문서 편집 화면에 저장 상태(Saving/Saved/Save failed)를 실시간으로 표시하여 사용자가 현재 상태를 알 수 있게 했습니다.' },
+    { title: 'TipTap 문서 자동 저장 실패 — debounce + 낙관적 업데이트', content: '문서 편집 중 내용이 간헐적으로 저장되지 않는 문제가 발생했습니다. 원인은 빠른 타이핑 시 API 요청이 race condition을 일으키는 것이었습니다.\n\nZustand에 debounce된 저장 로직을 구현하여 타이핑이 멈춘 후 일정 시간 뒤에만 저장 요청을 보내도록 했고, 낙관적 업데이트 패턴을 적용하여 서버 응답을 기다리지 않고 즉시 UI에 반영하되, 실패 시 롤백하는 방식으로 해결했습니다.' },
+    { title: 'psql에서 한글 파일명 Unicode 깨짐 — DB 정책 수립', content: 'psql 콘솔에서 doc_page.content를 직접 UPDATE했더니, r2:// 이미지 URL에 포함된 한글 파일명의 Unicode 정규화(NFD→NFC)가 깨져서 이미지가 모두 깨지는 문제가 발생했습니다.\n\n이후 doc_page.content는 SQL로 직접 UPDATE하지 않는다는 DB 정책을 수립하고, 반드시 애플리케이션 레이어를 통해서만 수정하도록 규칙을 만들었습니다.' },
+    { title: 'R2 Presigned URL CORS 에러 — Cloudflare Workers 프록시', content: '브라우저에서 R2 Presigned URL로 직접 파일을 업로드할 때 CORS 에러가 발생했습니다.\n\nCloudflare Workers를 프록시로 두어 CORS 헤더를 제어하고, 파일 검증 로직도 추가하여 해결했습니다.' },
+    { title: '한글 IME Enter 버그 — isComposing 체크', content: '문서 제목 입력란에서 한글을 입력하고 Enter를 누르면, 한글 조합이 끝나지 않은 상태에서 Enter가 동작하여 의도치 않게 에디터로 포커스가 이동하는 버그가 발생했습니다.\n\n원인은 한글 IME(입력기)의 조합 중(composing) 상태에서 Enter 키 이벤트가 발생하는 것이었습니다. onKeyDown 핸들러에 e.nativeEvent.isComposing 체크를 추가하여, IME 조합 중에는 Enter 동작을 무시하도록 수정했습니다.' },
   ],
   'b3d-ods': [
     { title: 'JSP → React 점진적 마이그레이션 전략', content: '운영 중인 서비스를 중단 없이 마이그레이션해야 하는 상황. 페이지 단위로 React를 점진 도입하고, iframe 기반 하이브리드 방식으로 레거시와 공존시켰습니다.' },
     { title: '멀티 컴퍼니 데이터 격리 설계', content: 'SaaS 전환 시 companyId 기반 데이터 격리가 필요했습니다. JPA의 @Filter와 커스텀 Interceptor를 조합하여 쿼리 레벨에서 자동 필터링을 구현했습니다.' },
-  ],
-  'mungnyanglog': [
-    { title: 'KMP에서 플랫폼별 위치 권한 처리 — expect/actual 패턴', content: 'Android와 iOS의 위치 권한 요청 방식이 완전히 달라 산책 기능 구현에 어려움. expect/actual 패턴으로 LocationPermissionHandler를 추상화하고, 플랫폼별 구현체를 분리하여 해결했습니다.' },
-    { title: 'GPS 산책 경로 데이터 유실 — 로컬 저장 + 재전송 로직', content: '산책 중 네트워크 끊김 시 경로 데이터가 유실되는 문제. WalkLocalData에 경로를 실시간 저장하고, 네트워크 복구 시 서버에 재전송하는 방식으로 해결했습니다.' },
-    { title: 'Spring AI Function Calling 응답 지연 — 스트리밍 방식 전환', content: 'AI 상담사 응답이 길어지면 사용자가 빈 화면을 오래 보는 문제. Spring AI의 스트리밍 응답을 적용하여 토큰 단위로 실시간 표시하도록 개선했습니다.' },
   ],
 }
 
@@ -221,7 +232,7 @@ export function ProjectDetail({ id }: { readonly id: string }) {
           href="/portfolio#projects"
           className="group inline-flex items-center gap-2 text-[13px] font-medium text-text-muted transition-colors hover:text-text-primary"
         >
-          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" style={{ color: project.accent || '#555' }} />
           BACK TO PROJECTS
         </Link>
       </motion.div>
@@ -333,15 +344,15 @@ export function ProjectDetail({ id }: { readonly id: string }) {
             </h2>
           <div className="border-t border-border">
             {[
-              { title: '주요 기능', items: project.highlights.map((h) => ({ title: h, content: highlightContentData[project.id]?.[h] || '' })) },
-              { title: '트러블슈팅', items: troubleshootingData[project.id] },
-              { title: '변경 사항', items: changelogData[project.id] },
-              { title: '개선 사항', items: improvementData[project.id] },
+              { title: '주요 기능', items: project.highlights.map((h) => ({ title: h, content: highlightContentData[project.id]?.[h] || '' })), defaultOpen: true },
+              { title: '시행착오', items: troubleshootingData[project.id], defaultOpen: true },
+              { title: '변경 사항', items: changelogData[project.id], defaultOpen: false },
+              { title: '개선 사항', items: improvementData[project.id], defaultOpen: false },
             ]
-              .filter((ch): ch is { title: string; items: readonly ToggleItem[] } => !!ch.items?.length)
+              .filter((ch): ch is { title: string; items: readonly ToggleItem[]; defaultOpen: boolean } => !!ch.items?.length)
               .map((ch, i) => (
-                <ChapterToggle key={ch.title} num={String(i + 1).padStart(2, '0')} title={ch.title} count={ch.items.length}>
-                  <ItemToggleList items={ch.items} />
+                <ChapterToggle key={ch.title} num={String(i + 1).padStart(2, '0')} title={ch.title} count={ch.items.length} defaultOpen={ch.defaultOpen}>
+                  <ItemToggleList items={ch.items} accent={project.accent} />
                 </ChapterToggle>
               ))}
           </div>
