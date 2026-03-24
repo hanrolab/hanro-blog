@@ -107,8 +107,10 @@ const changelogData: Record<string, readonly ToggleItem[]> = {
     { title: 'v1.5 — JSP → React 마이그레이션', content: '레거시 JSP 기반 프론트엔드를 React 19 + TypeScript로 완전 마이그레이션했습니다. shadcn/ui 컴포넌트 시스템 도입으로 개발 속도가 크게 향상되었습니다.' },
   ],
   'readip': [
-    { title: 'v1.1 — Gemini AI 번역 엔진 도입', content: 'Google Translate에서 Gemini AI로 번역 엔진을 전환하여 문맥 인식 번역 품질을 향상시켰습니다.' },
-    { title: 'v1.0 — iOS/Android 동시 출시', content: 'Kotlin Multiplatform으로 개발하여 Android와 iOS에 동시 출시했습니다. 코드 80% 이상을 공유합니다.' },
+    { title: 'v1.3 — Orbit MVI + Widget-Section-Screen 아키텍처 전환', content: '694줄 모놀리스 ReadipApi를 5개 도메인 API로 분리하고, 14개 Orbit MVI ViewModel을 도입했습니다. 이어서 8개 Screen의 private composable을 widget/section 파일로 추출하여 코드 재사용성을 높였습니다.' },
+    { title: 'v1.2 — Supabase → Spring Boot 서버 전환', content: 'BaaS 의존에서 벗어나 Spring Boot 4 + Kotlin 자체 서버로 전환했습니다. Koin DI를 도입하고, 인증 체계를 자체 JWT 기반으로 재설계했습니다.' },
+    { title: 'v1.1 — Gemini AI 번역 엔진 도입', content: 'Google Translate에서 Gemini 2.0 Flash로 번역 엔진을 전환하여 문맥 인식 번역 품질을 향상시켰습니다. 단어 번역과 문맥 번역 두 가지 모드를 제공합니다.' },
+    { title: 'v1.0 — iOS/Android 동시 출시', content: 'Kotlin Multiplatform으로 개발하여 Android와 iOS에 동시 출시했습니다. 코드 80% 이상을 공유하며, Supabase 기반 MVP로 시작했습니다.' },
   ],
 }
 
@@ -121,6 +123,14 @@ const improvementData: Record<string, readonly ToggleItem[]> = {
 
 
 const highlightContentData: Record<string, Record<string, string>> = {
+  'readip': {
+    'KMP로 Android/iOS 동시 지원 (코드 80%+ 공유)': 'Kotlin Multiplatform + Compose Multiplatform으로 Android와 iOS를 하나의 코드베이스로 개발합니다. UI, 비즈니스 로직, 네트워킹(Ktor), 데이터 모델, 로컬 저장(DataStore)을 commonMain에 작성하고, 인증(Google Credential Manager / Apple Sign-In), 결제(RevenueCat), 배터리 모니터링 등 플랫폼 고유 기능만 expect/actual 패턴으로 분리했습니다.\n\nKoin DI로 ViewModel과 API 클래스의 의존성을 주입하고, 서버 URL도 expect/actual로 분리하여 Android 에뮬레이터(10.0.2.2)와 iOS 시뮬레이터(localhost)를 자동 분기합니다.\n\n가장 어려웠던 점은 iOS 결제 연동이었습니다. RevenueCat SDK가 Swift 기반이라 KMP에서 직접 호출할 수 없어서, PurchaseBridge.kt(Kotlin)와 RevenueCatHelper.swift(Swift) 사이의 브릿지 패턴을 설계해야 했습니다. 콜백 기반 통신으로 구매, 복원, 로그인/로그아웃을 양방향으로 연결했습니다.',
+    'Gemini AI 기반 문맥 인식 번역': 'Gemini 2.0 Flash 모델을 활용한 실시간 번역 시스템입니다. 두 가지 번역 모드를 제공합니다.\n\n단어 번역(translateWord)은 선택한 단어의 뜻과 품사(명사, 동사, 형용사 등)를 추출하고, 문맥 번역(translateWithContext)은 단어가 포함된 전체 문장을 함께 전송하여 문맥에 맞는 번역을 제공합니다. 예를 들어 "bank"가 강둑인지 은행인지를 주변 문장으로 판별합니다.\n\n한국어, 영어, 일본어, 중국어, 스페인어, 프랑스어, 독일어 7개 언어를 지원하며, API 실패 시 exponential backoff(1초, 2초, 3초)로 최대 3회 재시도합니다. 429(Rate Limit)와 5xx 에러를 구분하여 재시도 여부를 판단합니다.\n\n어려웠던 점은 Gemini API의 응답 형식이 일관되지 않는 것이었습니다. JSON으로 응답하라고 프롬프트에 명시해도 가끔 마크다운이나 텍스트가 섞여서 돌아왔습니다. 정규식 기반 JSON 추출을 1차로 시도하고, 실패하면 raw 텍스트를 파싱하는 2단계 폴백 구조로 해결했습니다.',
+    'CEFR A1~C2 레벨별 도서 큐레이션': '유럽 공통 언어 참조 기준(CEFR)에 따라 A1(입문)부터 C2(원어민)까지 6단계로 도서를 분류합니다. 각 레벨은 고유 색상(A1 초록 → C2 빨강 그라디언트)으로 시각적으로 구분되며, 레벨별·장르별 필터링과 정렬을 지원합니다.\n\n콘텐츠는 프로젝트 구텐베르크 등 퍼블릭 도메인 원서를 기반으로, Claude AI의 도움을 받아 한국어 번역과 CEFR 레벨 태깅을 진행합니다. upload_books.py 스크립트로 원문(en.txt)과 번역(ko.txt)을 서버에 업로드하고, 관리자 대시보드에서 메타데이터(장르, 레벨, 표지 이미지)를 관리합니다.\n\n홈 화면에서는 "이어 읽기", "짧은 글", "긴 글" 섹션별로 도서를 노출하고, 레벨별/장르별 전체 보기 화면에서 정렬(최신순, 제목순)과 필터를 제공합니다. 장르를 추가할 때는 enum, UI 아이콘, 색상, 서버 데이터를 모두 동기화해야 하므로 체크리스트를 만들어 관리합니다.',
+    'Orbit MVI + Widget-Section-Screen 아키텍처': '초기에는 13개 화면에서 694줄짜리 모놀리스 ReadipApi를 직접 호출하는 구조였습니다. 화면마다 koinInject<ReadipApi>()를 쓰고 있었고, API 호출과 상태 관리가 Screen 안에 뒤섞여 있었습니다.\n\n이를 두 단계로 리팩토링했습니다.\n\n1단계: ReadipApi를 BookApi, ReadingApi, WordApi, ConfigApi, AccountApi 5개 도메인으로 분리하고, 14개 Orbit MVI ViewModel을 도입하여 모든 화면에서 API 직접 호출을 제거했습니다. State(불변 데이터 클래스) + Intent(상태 변경 함수) + SideEffect(일회성 이벤트) 패턴으로 상태를 관리합니다.\n\n2단계: 8개 Screen 파일의 private composable 함수를 widget/(재사용 UI 단위)과 section/(화면 영역) 파일로 분리했습니다. SettingsScreen 838줄 → 482줄, QuizScreen 802줄 → 287줄, FlashcardScreen 788줄 → 307줄 등 대폭 축소되었고, 신규 19개 파일을 생성하여 컴포넌트 재사용성을 높였습니다.\n\nMVVM 대신 Orbit MVI를 선택한 이유는 복잡한 상태 흐름(번역 → 저장 → 퀴즈 생성)에서 Intent 기반 단방향 데이터 흐름이 디버깅에 유리했기 때문입니다.',
+    'RevenueCat 기반 Freemium 수익화': 'RevenueCat SDK를 활용하여 Android(Google Play Billing)와 iOS(StoreKit 2)의 구독 결제를 통합 관리합니다. 무료 유저는 5권까지 읽을 수 있고, 프리미엄 구독 시 전체 도서와 AI 번역을 무제한으로 이용할 수 있습니다.\n\n무료 도서 제한 수(free_book_limit)는 서버 설정에서 동적으로 관리하여 하드코딩 없이 운영할 수 있습니다. 이미 시작한 책은 제한에 걸려도 계속 읽을 수 있도록 하여 사용자 경험을 보호합니다.\n\n프리미엄 상태는 3중 레이어로 판별합니다: (1) RevenueCat 구독 상태, (2) 관리자 대시보드에서 수동 부여한 DB 프리미엄, (3) 서버 응답의 프리미엄 플래그. 셋 중 하나라도 true이면 프리미엄으로 처리합니다. AdminPremiumCache를 도입하여 테스트와 CS 대응 시 앱 재시작 없이 프리미엄을 부여할 수 있습니다.',
+    'Next.js 관리자 대시보드': 'Next.js 16 + React 19 기반의 관리자 대시보드로, 도서 관리, 유저 관리, 태그 관리, 앱 설정, 통계를 제공합니다.\n\n도서 관리에서는 CRUD, 콘텐츠 업로드, 독자 현황 조회가 가능합니다. 태그 관리에서는 AI 기반 주제 태그 자동 생성(5개 추천), 태그 유사도 분석, 카테고리별 복수 선택을 지원합니다. 유저 관리에서는 읽기 통계와 함께 RevenueCat API 연동으로 프리미엄 수동 부여/해제가 가능합니다.\n\n앱 설정(Config) 페이지에서는 무료 도서 제한 수, 기능 플래그 등을 서버 재시작 없이 실시간으로 변경할 수 있습니다. 랜딩 페이지도 포함되어 있어 App Store, Google Play 링크와 스크린샷을 노출합니다.\n\nCloudflare Pages에 배포하고, Supabase를 데이터베이스로 사용합니다. Edge Runtime으로 서버리스 API 라우트를 운영하여 콜드 스타트를 최소화했습니다.',
+  },
   'mungnyanglog': {
     'Firebase OAuth 인증 (Google / Apple)': '글로벌 시장 진출을 위해 카카오/네이버를 제외하고 Google, Apple 로그인만 채택.\n\n클라이언트에서 Firebase로 인증 후 ID Token을 서버에 전송하면, 서버는 Firebase Admin SDK로 토큰을 검증하는 구조입니다. 토큰 갱신, 세션 유지, 로그아웃 처리는 Firebase Auth에 위임하여 인증 로직을 단순화했습니다.\n\n에러 핸들링은 서버에서 커스텀 에러 코드만 반환하고, 클라이언트에서 다국어 토스트 메시지로 파싱하는 구조로 글로벌 대응했습니다.\n\n회원 탈퇴는 30일 유예 기간을 두고, 매일 새벽 스케줄러가 탈퇴 신청 후 30일이 지난 유저를 확인하여 관련 데이터를 삭제합니다. 관련 데이터는 탈퇴자 ID를 쿼리에서 필터링하는 방식으로, 대량 soft delete 없이 효율적으로 처리했습니다.',
     '가족 그룹 생성 / 초대 / 권한 관리': '초대 코드(대문자, I, 1 제외), 링크, 이메일, 카카오톡 공유 4가지 방식으로 가족을 초대합니다. 초대 코드는 24시간 만료이며, 클라이언트에서 타이머를 표시하고 만료 시 재발급 UI를 노출합니다. 캐시 없이 항상 서버 조회하여 모든 구성원이 동일한 상태를 봅니다.\n\n권한은 읽기/쓰기/삭제의 다중 권한 구조이며, Admin만 권한 조작이 가능합니다. 영유아 등 가족 구성원의 잘못된 조작을 방지하기 위해 삭제/수정 권한을 제한했습니다. 게스트 모드는 펫시터 등 임시 접근용으로, 실시간 산책 추적을 허용하면서도 데이터 수정은 차단합니다.\n\n그룹 탈퇴 시 본인이 작성한 데이터는 유지되지만 가족 그룹에서는 비노출 처리합니다. Owner는 모든 구성원이 탈퇴해야만 그룹을 삭제할 수 있습니다. DB는 그룹-유저 N:N 관계이며, FK 없이 ID 참조 방식으로 설계했습니다.',
@@ -147,9 +157,16 @@ const troubleshootingData: Record<string, readonly ToggleItem[]> = {
     { title: 'JSP → React 점진적 마이그레이션 전략', content: '운영 중인 서비스를 중단 없이 마이그레이션해야 하는 상황. 페이지 단위로 React를 점진 도입하고, iframe 기반 하이브리드 방식으로 레거시와 공존시켰습니다.' },
     { title: '멀티 컴퍼니 데이터 격리 설계', content: 'SaaS 전환 시 companyId 기반 데이터 격리가 필요했습니다. JPA의 @Filter와 커스텀 Interceptor를 조합하여 쿼리 레벨에서 자동 필터링을 구현했습니다.' },
   ],
+  'readip': [
+    { title: 'Supabase → Spring Boot 전환 — 인증/API 전면 재설계', content: 'MVP 단계에서 Supabase(BaaS)로 빠르게 개발했지만, 비즈니스 로직이 복잡해지면서 Edge Function의 한계에 부딪혔습니다. 특히 RevenueCat 웹훅 처리, 복잡한 쿼리, 트랜잭션 관리가 어려워 Spring Boot로 전환을 결정했습니다.\n\n전환은 2단계로 진행했습니다. 1단계에서 SupabaseApi를 ReadipApi로 전면 교체하고 Koin DI를 세팅했습니다. 모든 Screen에서 koinInject<ReadipApi>()로 전환하고, expect/actual로 플랫폼별 서버 URL(Android: 10.0.2.2, iOS: localhost)을 분리했습니다.\n\n2단계에서 Supabase Auth를 Spring Boot의 /auth/google, /auth/apple 엔드포인트로 전환하고, supabase/ 디렉토리(config, migrations, edge functions)를 전부 삭제했습니다. 데이터 모델도 snake_case에서 camelCase로 전면 전환하여 서버 표준에 맞췄습니다.' },
+    { title: '리더 패딩 플랫폼별 동적 계산 — 8번의 수정', content: '리더 화면의 상단/하단 패딩을 맞추는 데 8번의 커밋이 필요했습니다. Android와 iOS의 상태바, 네비게이션 바 높이가 다르고, Compose Multiplatform의 WindowInsets 처리 방식이 플랫폼마다 달랐기 때문입니다.\n\n초기에는 하드코딩(40dp)으로 처리했지만 기기마다 달라서 실패했습니다. WindowInsets.statusBars로 전환한 후에도 App.kt에서 이미 inset을 처리하고 있어 이중 적용되는 문제가 발생했습니다.\n\n최종적으로 상태바 높이를 실측하여 동적 계산하는 방식으로 해결했습니다: (48dp - statusBarHeight).coerceAtLeast(8dp). Android(~24dp 상태바) → 24dp 패딩, iOS(~59dp 상태바) → 8dp 패딩으로 플랫폼별 최적값을 적용했습니다.' },
+    { title: 'Pull-to-Refresh 무한 로딩 — LaunchedEffect 의존성 문제', content: '홈 화면에서 Pull-to-Refresh를 추가한 후, 새로고침이 완료되지 않고 무한 로딩 인디케이터가 표시되는 버그가 발생했습니다.\n\n원인은 loadData() 시작 시 isLoaded 상태를 false로 리셋하지 않아서, LaunchedEffect가 데이터 로딩 완료를 감지하지 못하는 것이었습니다. Compose의 LaunchedEffect는 key 값이 변경될 때만 재실행되는데, isLoaded가 이미 true인 상태에서 refresh를 호출하면 상태 변화가 없어 UI가 갱신되지 않았습니다.\n\nloadData() 시작 시점에 isLoaded = false를 명시적으로 리셋하여 해결했습니다.' },
+    { title: 'UI 공통화로 3,100줄 감소 — 위젯 추출 전략', content: '6개 화면에서 동일한 책 카드, 헤더, 정렬 바텀시트를 각각 구현하고 있어 코드 중복이 심했습니다. 특히 BookGridCard가 홈 섹션과 전체 보기 6곳에서 거의 같은 코드로 반복되고, SortBottomSheet도 5개 화면에 복사되어 있었습니다.\n\n공통 위젯 5개(BookGridCard, BookRowCard, BookListHeader, SortBottomSheet, HorizontalBookSection)를 추출하고, TagChip, LevelTagChip 등 소규모 위젯도 분리했습니다. 약 3,100줄이 감소했고, 새로운 목록 화면 추가 시 위젯 조합만으로 개발이 가능해졌습니다.' },
+    { title: 'API 토큰 동시 갱신 Race Condition — Mutex 보호', content: '여러 API를 병렬로 호출하는 홈 화면에서, 토큰이 만료된 상태로 5개 요청이 동시에 발생하면 5개 모두 401을 받고, 5개 모두 토큰 갱신을 시도하는 문제가 발생했습니다.\n\nKotlin Coroutines의 Mutex로 토큰 갱신 로직을 보호하여, 첫 번째 요청만 실제 갱신을 수행하고 나머지는 갱신 완료를 기다린 후 새 토큰으로 재시도하도록 했습니다. 401/403 응답 시 자동으로 토큰을 갱신하고 원래 요청을 재전송하는 인터셉터를 ApiClient에 구현했습니다.' },
+  ],
 }
 
-function ImageCarousel({ images, title, accent }: { images: string[]; title: string; accent?: string }) {
+function ImageCarousel({ images, title, accent: _accent }: { images: string[]; title: string; accent?: string }) {
   const [current, setCurrent] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
 
