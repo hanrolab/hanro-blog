@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 
 interface TocItem {
   id: string
@@ -8,15 +8,17 @@ interface TocItem {
   level: number
 }
 
-export function TableOfContents() {
+export function TableOfContents({ contentReady }: { readonly contentReady?: boolean }) {
   const [headings, setHeadings] = useState<TocItem[]>([])
   const [activeId, setActiveId] = useState('')
 
-  useEffect(() => {
+  const buildToc = useCallback(() => {
     const postContent = document.querySelector('.post-content')
-    if (!postContent) return
+    if (!postContent) return null
 
     const domHeadings = postContent.querySelectorAll('h1, h2, h3')
+    if (domHeadings.length === 0) return null
+
     const items: TocItem[] = []
     const usedIds = new Set<string>()
 
@@ -39,9 +41,15 @@ export function TableOfContents() {
       items.push({ id, text, level })
     })
 
-    setHeadings(items)
+    return { items, domHeadings }
+  }, [])
 
-    // Observe for active heading
+  useEffect(() => {
+    const result = buildToc()
+    if (!result) return
+
+    setHeadings(result.items)
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -53,10 +61,10 @@ export function TableOfContents() {
       { rootMargin: '-80px 0px -70% 0px', threshold: 0 }
     )
 
-    domHeadings.forEach((el) => observer.observe(el))
+    result.domHeadings.forEach((el) => observer.observe(el))
 
     return () => observer.disconnect()
-  }, [])
+  }, [contentReady, buildToc])
 
   if (headings.length === 0) return null
 

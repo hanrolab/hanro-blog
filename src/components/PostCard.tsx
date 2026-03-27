@@ -13,6 +13,8 @@ export function PostCard({ post }: PostCardProps) {
     day: 'numeric',
   })
 
+  const isDraft = !post.published
+
   // With thumbnail
   if (post.thumbnail) {
     return (
@@ -29,6 +31,7 @@ export function PostCard({ post }: PostCardProps) {
           </div>
           <div className="mt-5">
             <h2 className="text-[1.375rem] font-bold leading-snug text-text-primary transition-colors group-hover:text-accent">
+              {isDraft && <span className="mr-2 inline-block rounded bg-yellow-100 px-1.5 py-0.5 text-xs font-medium text-yellow-700">비공개</span>}
               {post.title}
             </h2>
             {post.excerpt && (
@@ -48,6 +51,7 @@ export function PostCard({ post }: PostCardProps) {
     <Link href={`/post/${post.slug}`} className="group block py-10">
       <article>
         <h2 className="text-[1.375rem] font-bold leading-snug text-text-primary transition-colors group-hover:text-accent">
+          {isDraft && <span className="mr-2 inline-block rounded bg-yellow-100 px-1.5 py-0.5 text-xs font-medium text-yellow-700">비공개</span>}
           {post.title}
         </h2>
         {post.excerpt && (

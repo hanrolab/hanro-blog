@@ -101,7 +101,7 @@ export function PostDetail({ slug }: PostDetailProps) {
     <div className="min-h-screen bg-bg">
       <BlogHeader />
 
-      <div className="mx-auto max-w-[1100px] px-6 py-12">
+      <div className="mx-auto max-w-[1280px] px-6 py-12">
         <div className="flex gap-0">
           {/* Main Content */}
           <article className="min-w-0 flex-1">
@@ -124,7 +124,7 @@ export function PostDetail({ slug }: PostDetailProps) {
                 <time>{date}</time>
               </div>
 
-              <AdminControls slug={slug} />
+              <AdminControls slug={slug} published={post.published} />
             </header>
 
             {/* Content */}
@@ -135,9 +135,9 @@ export function PostDetail({ slug }: PostDetailProps) {
           </article>
 
           {/* TOC — sticky sidebar */}
-          <aside className="hidden w-[200px] shrink-0 pl-10 xl:block">
+          <aside className="hidden w-[160px] shrink-0 pl-4 xl:block">
             <div className="sticky top-[80px]">
-              <TableOfContents />
+              <TableOfContents contentReady={!!post} />
             </div>
           </aside>
         </div>

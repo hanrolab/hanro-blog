@@ -14,7 +14,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') ?? '12', 10)))
   const offset = (page - 1) * limit
 
-  let whereClauses = 'WHERE published = 1'
+  const isAdmin = await getIsAdmin()
+  const status = searchParams.get('status')
+
+  let whereClauses: string
+  if (isAdmin && status === 'draft') {
+    whereClauses = 'WHERE published = 0'
+  } else {
+    whereClauses = 'WHERE published = 1'
+  }
   const params: unknown[] = []
 
   if (category) {
@@ -47,7 +55,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     limit,
     hasMore: offset + posts.length < totalCount,
   })
-  response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300')
+  response.headers.set('Cache-Control', 'no-cache')
   return response
 }
 

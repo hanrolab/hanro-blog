@@ -8,6 +8,7 @@ import type { PostListItem } from '@/lib/types'
 
 interface PostListProps {
   category: string | null
+  status?: string | null
 }
 
 const LIMIT = 5
@@ -20,16 +21,17 @@ interface PostsResponse {
   hasMore: boolean
 }
 
-async function fetchPosts({ category, pageParam }: { category: string | null; pageParam: number }): Promise<PostsResponse> {
+async function fetchPosts({ category, status, pageParam }: { category: string | null; status?: string | null; pageParam: number }): Promise<PostsResponse> {
   const url = new URL('/api/posts', window.location.origin)
   if (category) url.searchParams.set('category', category)
+  if (status) url.searchParams.set('status', status)
   url.searchParams.set('page', String(pageParam))
   url.searchParams.set('limit', String(LIMIT))
   const res = await fetch(url.toString())
   return res.json()
 }
 
-export function PostList({ category }: PostListProps) {
+export function PostList({ category, status }: PostListProps) {
   const sentinelRef = useRef<HTMLDivElement>(null)
 
   const {
@@ -39,8 +41,8 @@ export function PostList({ category }: PostListProps) {
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
-    queryKey: ['posts', category],
-    queryFn: ({ pageParam }) => fetchPosts({ category, pageParam }),
+    queryKey: ['posts', category, status],
+    queryFn: ({ pageParam }) => fetchPosts({ category, status, pageParam }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.page + 1 : undefined),
   })

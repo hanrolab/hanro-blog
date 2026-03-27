@@ -25,7 +25,7 @@ export async function GET(
   await queryD1('UPDATE posts SET views = views + 1 WHERE slug = ?', [slug])
 
   const response = NextResponse.json({ post: { ...posts[0], views: (posts[0].views || 0) + 1 } })
-  response.headers.set('Cache-Control', 'public, max-age=300')
+  response.headers.set('Cache-Control', 'no-cache')
   return response
 }
 
@@ -66,6 +66,33 @@ export async function PUT(
     "UPDATE posts SET title = ?, content = ?, thumbnail = ?, category = ?, tags = ?, published = ?, excerpt = ?, updated_at = datetime('now') WHERE slug = ?",
     [title, sanitizedContent, thumbnail ?? null, category ?? null, tags ?? null, published ? 1 : 0, excerpt, slug]
   )
+
+  return NextResponse.json({ success: true })
+}
+
+// PATCH /api/posts/[slug] — partial update (e.g. toggle publish)
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ slug: string }> }
+): Promise<NextResponse> {
+  const isAdmin = await getIsAdmin()
+  if (!isAdmin) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const { slug } = await params
+  if (!slugParamSchema.safeParse(slug).success) {
+    return NextResponse.json({ error: 'Invalid slug' }, { status: 400 })
+  }
+
+  const body = await request.json()
+
+  if (typeof body.published === 'boolean') {
+    await queryD1(
+      "UPDATE posts SET published = ?, updated_at = datetime('now') WHERE slug = ?",
+      [body.published ? 1 : 0, slug]
+    )
+  }
 
   return NextResponse.json({ success: true })
 }

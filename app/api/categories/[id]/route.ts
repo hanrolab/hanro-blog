@@ -27,9 +27,9 @@ export async function DELETE(
     return NextResponse.json({ error: 'Category not found' }, { status: 404 })
   }
 
-  // Check if any published posts use this category
+  // Check if any posts (including drafts) use this category
   const usage = await queryD1<{ cnt: number }>(
-    'SELECT COUNT(*) as cnt FROM posts WHERE category = ? AND published = 1',
+    'SELECT COUNT(*) as cnt FROM posts WHERE category = ?',
     [categories[0].name]
   )
   if ((usage[0]?.cnt ?? 0) > 0) {

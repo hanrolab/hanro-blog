@@ -11,6 +11,7 @@ export function Blog() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const selectedCategory = searchParams.get('category')
+  const status = searchParams.get('status')
 
   const handleCategorySelect = useCallback((category: string | null) => {
     if (category) {
@@ -42,7 +43,7 @@ export function Blog() {
               </div>
             </div>
 
-            <PostList category={selectedCategory} />
+            <PostList category={selectedCategory} status={status} />
           </main>
         </div>
       </div>

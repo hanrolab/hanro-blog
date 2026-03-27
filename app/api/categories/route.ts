@@ -21,7 +21,7 @@ export async function GET(): Promise<NextResponse> {
     categories,
     totalCount: totalResult[0]?.cnt ?? 0,
   })
-  response.headers.set('Cache-Control', 'public, max-age=3600')
+  response.headers.set('Cache-Control', 'no-cache')
   return response
 }
 
