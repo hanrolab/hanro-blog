@@ -25,3 +25,13 @@ out
 *.sln
 *.sw?
 public/designs/
+
+# Build outputs
+.open-next/
+.wrangler/
+
+# Backups
+.moai-backups/
+
+# Environment
+.env.local.bak
