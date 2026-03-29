@@ -50,11 +50,11 @@ export const projects: readonly Project[] = [
     ],
     highlights: [
       '25개+ 비즈니스 도메인 통합 관리',
-      'Gemini AI 기반 자연어 데이터 조회',
+      'Gemini AI Function Calling 기반 자연어 조회',
       '멀티 컴퍼니 SaaS 아키텍처',
-      'JWT + Redis 기반 인증/권한 시스템',
-      'TipTap 리치 텍스트 에디터 통합',
-      'Drag & Drop 기반 워크플로우',
+      '287개 권한 조합의 RBAC 시스템',
+      'JSP → React 19 점진적 마이그레이션',
+      'Kotest BDD + E2E 테스트 자동화',
     ],
     status: 'in-progress',
     category: 'WEB APP',
@@ -66,9 +66,9 @@ export const projects: readonly Project[] = [
     mockupType: 'web',
     accent: '#6366f1',
     images: {
-      desktop: '/images/b3d-desktop.png',
-      tablet: '/images/b3d-tablet.png',
-      mobile: '/images/b3d-mobile.png',
+      desktop: 'https://pub-fce05bb72018417aa88c032932bfeb49.r2.dev/portfolio/b3d-desktop.png',
+      tablet: 'https://pub-fce05bb72018417aa88c032932bfeb49.r2.dev/portfolio/b3d-tablet.png',
+      mobile: 'https://pub-fce05bb72018417aa88c032932bfeb49.r2.dev/portfolio/b3d-mobile.png',
     },
   },
   {
@@ -107,7 +107,7 @@ export const projects: readonly Project[] = [
     mockupType: 'mobile',
     accent: '#10b981',
     images: {
-      mobile: '/images/readip-mobile.png',
+      mobile: 'https://pub-fce05bb72018417aa88c032932bfeb49.r2.dev/portfolio/readip-mobile.png',
     },
   },
   {
@@ -151,10 +151,10 @@ export const projects: readonly Project[] = [
     mockupType: 'web',
     accent: '#8b5cf6',
     images: {
-      hero: '/images/realm-docs.png',
-      desktop: '/images/realm-hero.png',
-      tablet: '/images/realm-calendar.png',
-      mobile: '/images/realm-erd.png',
+      hero: 'https://pub-fce05bb72018417aa88c032932bfeb49.r2.dev/portfolio/realm-docs.png',
+      desktop: 'https://pub-fce05bb72018417aa88c032932bfeb49.r2.dev/portfolio/realm-hero.png',
+      tablet: 'https://pub-fce05bb72018417aa88c032932bfeb49.r2.dev/portfolio/realm-calendar.png',
+      mobile: 'https://pub-fce05bb72018417aa88c032932bfeb49.r2.dev/portfolio/realm-erd.png',
     },
   },
   {
@@ -197,9 +197,9 @@ export const projects: readonly Project[] = [
     accent: '#f59e0b',
     noDeviceFrame: true,
     images: {
-      hero: '/images/mungnyanglog-hero.png',
-      mobile: '/images/mungnyanglog-health-record.png',
-      desktop: '/images/mungnyanglog-ai-chat.png',
+      hero: 'https://pub-fce05bb72018417aa88c032932bfeb49.r2.dev/portfolio/mungnyanglog-hero.png',
+      mobile: 'https://pub-fce05bb72018417aa88c032932bfeb49.r2.dev/portfolio/mungnyanglog-health-record.png',
+      desktop: 'https://pub-fce05bb72018417aa88c032932bfeb49.r2.dev/portfolio/mungnyanglog-ai-chat.png',
     },
   },
 ] as const

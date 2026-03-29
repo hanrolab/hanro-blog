@@ -1,61 +1,67 @@
-import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { AwsClient } from 'aws4fetch'
+import { getCfEnv } from './cloudflare'
 import { getEnv } from './env'
 
-let _s3: S3Client | null = null
+let _aws: AwsClient | null = null
 
-function getS3(): S3Client {
-  if (!_s3) {
+function getAwsClient(): AwsClient {
+  if (!_aws) {
     const env = getEnv()
-    _s3 = new S3Client({
-      region: 'auto',
-      endpoint: env.R2_ENDPOINT,
-      credentials: {
-        accessKeyId: env.R2_ACCESS_KEY_ID,
-        secretAccessKey: env.R2_SECRET_ACCESS_KEY,
-      },
+    _aws = new AwsClient({
+      accessKeyId: env.R2_ACCESS_KEY_ID,
+      secretAccessKey: env.R2_SECRET_ACCESS_KEY,
     })
   }
-  return _s3
+  return _aws
 }
 
-function getBucket(): string {
-  return getEnv().R2_BUCKET_NAME
+function getR2Url(key: string): string {
+  const env = getEnv()
+  return `${env.R2_ENDPOINT}/${env.R2_BUCKET_NAME}/${key}`
 }
 
 export async function uploadToR2(key: string, body: Buffer | Uint8Array, contentType: string): Promise<void> {
-  const command = new PutObjectCommand({
-    Bucket: getBucket(),
-    Key: key,
-    Body: body,
-    ContentType: contentType,
+  const cf = await getCfEnv()
+
+  if (cf?.BUCKET) {
+    await cf.BUCKET.put(key, body, { httpMetadata: { contentType } })
+    return
+  }
+
+  // Local dev fallback: aws4fetch (S3-compatible API)
+  await getAwsClient().fetch(getR2Url(key), {
+    method: 'PUT',
+    headers: { 'Content-Type': contentType },
+    body: body as unknown as BodyInit,
   })
-  await getS3().send(command)
 }
 
-export async function generateUploadUrl(key: string, contentType: string): Promise<string> {
-  const command = new PutObjectCommand({
-    Bucket: getBucket(),
-    Key: key,
-    ContentType: contentType,
-  })
-  return getSignedUrl(getS3(), command, { expiresIn: 900 })
+export async function getFromR2(key: string): Promise<{ body: Uint8Array; contentType: string } | null> {
+  const cf = await getCfEnv()
+
+  if (cf?.BUCKET) {
+    const obj = await cf.BUCKET.get(key)
+    if (!obj) return null
+    const body = new Uint8Array(await obj.arrayBuffer())
+    return { body, contentType: obj.httpMetadata?.contentType ?? 'application/octet-stream' }
+  }
+
+  // Local dev fallback
+  const res = await getAwsClient().fetch(getR2Url(key), { method: 'GET' })
+  if (!res.ok) return null
+  const body = new Uint8Array(await res.arrayBuffer())
+  return { body, contentType: res.headers.get('content-type') ?? 'application/octet-stream' }
 }
 
-export async function generateDownloadUrl(key: string): Promise<string> {
-  const command = new GetObjectCommand({
-    Bucket: getBucket(),
-    Key: key,
-  })
-  return getSignedUrl(getS3(), command, { expiresIn: 900 })
-}
+export async function deleteFromR2(key: string): Promise<void> {
+  const cf = await getCfEnv()
 
-export async function deleteObject(key: string): Promise<void> {
-  const command = new DeleteObjectCommand({
-    Bucket: getBucket(),
-    Key: key,
-  })
-  await getS3().send(command)
+  if (cf?.BUCKET) {
+    await cf.BUCKET.delete(key)
+    return
+  }
+
+  await getAwsClient().fetch(getR2Url(key), { method: 'DELETE' })
 }
 
 export function buildFileKey(folder: string, fileName: string): string {

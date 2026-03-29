@@ -420,7 +420,7 @@ export function WriteView({ editMode = false, initialPost }: WriteViewProps) {
               <span className="hidden sm:inline">{editMode ? '임시저장' : '저장'}</span>
             </button>
             <button
-              onClick={() => handlePublish(true)}
+              onClick={() => handlePublish(editMode ? (initialPost?.published ?? true) : true)}
               disabled={saving}
               className="rounded-lg bg-text-primary px-5 py-2 text-[13px] font-medium text-bg transition-opacity hover:opacity-80 disabled:opacity-50"
             >

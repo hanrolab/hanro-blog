@@ -33,18 +33,20 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
   response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
-  response.headers.set(
-    'Content-Security-Policy',
-    [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
-      "img-src 'self' data: blob: https://*.r2.dev https://*.r2.cloudflarestorage.com",
-      "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net",
-      "connect-src 'self' https://api.cloudflare.com",
-      "frame-src 'self' https://www.youtube.com",
-    ].join('; ')
-  )
+  if (process.env.NODE_ENV === 'production') {
+    response.headers.set(
+      'Content-Security-Policy',
+      [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
+        "img-src 'self' data: blob: https://*.r2.dev https://*.r2.cloudflarestorage.com",
+        "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net",
+        "connect-src 'self' https://api.cloudflare.com",
+        "frame-src 'self' https://www.youtube.com",
+      ].join('; ')
+    )
+  }
 
   return response
 }

@@ -14,7 +14,7 @@ export function ProfileCard() {
       {/* Avatar */}
       <div className="flex flex-col items-center text-center">
         <img
-          src="/profile.jpeg"
+          src="https://pub-fce05bb72018417aa88c032932bfeb49.r2.dev/portfolio/profile.jpeg"
           alt="주진성"
           className="h-36 w-36 rounded-full object-cover"
         />

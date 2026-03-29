@@ -1,6 +1,8 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
+
+const HEADER_OFFSET = 96
 
 interface TocItem {
   id: string
@@ -11,6 +13,7 @@ interface TocItem {
 export function TableOfContents({ contentReady }: { readonly contentReady?: boolean }) {
   const [headings, setHeadings] = useState<TocItem[]>([])
   const [activeId, setActiveId] = useState('')
+  const headingEls = useRef<Element[]>([])
 
   const buildToc = useCallback(() => {
     const postContent = document.querySelector('.post-content')
@@ -41,7 +44,7 @@ export function TableOfContents({ contentReady }: { readonly contentReady?: bool
       items.push({ id, text, level })
     })
 
-    return { items, domHeadings }
+    return { items, elements: Array.from(domHeadings) }
   }, [])
 
   useEffect(() => {
@@ -49,21 +52,24 @@ export function TableOfContents({ contentReady }: { readonly contentReady?: bool
     if (!result) return
 
     setHeadings(result.items)
+    headingEls.current = result.elements
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id)
-          }
+    const updateActive = () => {
+      const els = headingEls.current
+      if (els.length === 0) return
+
+      let current = ''
+      for (const el of els) {
+        if (el.getBoundingClientRect().top <= HEADER_OFFSET) {
+          current = el.id
         }
-      },
-      { rootMargin: '-80px 0px -70% 0px', threshold: 0 }
-    )
+      }
+      setActiveId(current || els[0].id)
+    }
 
-    result.domHeadings.forEach((el) => observer.observe(el))
-
-    return () => observer.disconnect()
+    updateActive()
+    window.addEventListener('scroll', updateActive, { passive: true })
+    return () => window.removeEventListener('scroll', updateActive)
   }, [contentReady, buildToc])
 
   if (headings.length === 0) return null
@@ -89,7 +95,10 @@ export function TableOfContents({ contentReady }: { readonly contentReady?: bool
               title={item.text}
               onClick={(e) => {
                 e.preventDefault()
-                document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' })
+                const el = document.getElementById(item.id)
+                if (!el) return
+                const top = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET
+                window.scrollTo({ top, behavior: 'smooth' })
               }}
             >
               {item.text}

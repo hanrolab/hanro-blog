@@ -136,7 +136,7 @@ export function PostDetail({ slug }: PostDetailProps) {
 
           {/* TOC — sticky sidebar */}
           <aside className="hidden w-[160px] shrink-0 pl-4 xl:block">
-            <div className="sticky top-[80px]">
+            <div className="sticky top-[80px] max-h-[calc(100vh-120px)] overflow-y-auto">
               <TableOfContents contentReady={!!post} />
             </div>
           </aside>

@@ -310,7 +310,7 @@ export function Home() {
             </div>
 
             <div className="mt-8 aspect-[4/5] w-full max-w-[240px] overflow-hidden rounded-2xl">
-              <img src="/profile.jpeg" alt="주진성" className="h-full w-full object-cover" />
+              <img src="https://pub-fce05bb72018417aa88c032932bfeb49.r2.dev/portfolio/profile.jpeg" alt="주진성" className="h-full w-full object-cover" />
             </div>
           </motion.div>
 

@@ -69,6 +69,12 @@ body {
   color: var(--color-text-primary);
 }
 
+.post-content h1,
+.post-content h2,
+.post-content h3 {
+  scroll-margin-top: 96px;
+}
+
 .post-content h1 {
   font-size: 1.875rem;
   font-weight: 700;

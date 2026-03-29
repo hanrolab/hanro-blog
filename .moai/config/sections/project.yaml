@@ -24,4 +24,4 @@ project:
   optimized: false
 
   # Template version used to create/update this project
-  template_version: "2.7.20"
+  template_version: "2.7.22"
