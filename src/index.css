@@ -283,6 +283,8 @@ body {
 
 .post-content .table-scroll-wrapper table {
   margin-bottom: 0;
+  min-width: 100%;
+  width: max-content;
 }
 
 .post-content table {
