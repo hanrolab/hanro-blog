@@ -41,13 +41,20 @@ export function PostDetail({ slug }: PostDetailProps) {
       hljs.highlightElement(el as HTMLElement)
     })
 
-    // Wrap tables in scrollable container for mobile
+    // Wrap tables in scrollable container for mobile + fade hint
     document.querySelectorAll('.post-content table').forEach((table) => {
       if (table.parentElement?.classList.contains('table-scroll-wrapper')) return
       const wrapper = document.createElement('div')
       wrapper.className = 'table-scroll-wrapper'
       table.parentNode?.insertBefore(wrapper, table)
       wrapper.appendChild(table)
+
+      const updateFade = () => {
+        const atEnd = wrapper.scrollLeft + wrapper.clientWidth >= wrapper.scrollWidth - 2
+        wrapper.classList.toggle('scrolled-end', atEnd)
+      }
+      updateFade()
+      wrapper.addEventListener('scroll', updateFade, { passive: true })
     })
 
     document.querySelectorAll('.post-content pre').forEach((pre) => {

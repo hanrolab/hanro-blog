@@ -274,11 +274,33 @@ body {
   color: var(--color-text-muted);
 }
 
-/* Table in post — scrollable wrapper for mobile */
+/* Table in post — scrollable wrapper with fade hint */
 .post-content .table-scroll-wrapper {
+  position: relative;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   margin-bottom: 1.25rem;
+}
+
+.post-content .table-scroll-wrapper::after {
+  content: '';
+  position: sticky;
+  right: 0;
+  top: 0;
+  display: block;
+  width: 32px;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(to left, var(--color-bg), transparent);
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  transition: opacity 0.2s;
+}
+
+.post-content .table-scroll-wrapper.scrolled-end::after {
+  opacity: 0;
 }
 
 .post-content .table-scroll-wrapper table {
