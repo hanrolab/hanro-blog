@@ -274,7 +274,17 @@ body {
   color: var(--color-text-muted);
 }
 
-/* Table in post */
+/* Table in post — scrollable wrapper for mobile */
+.post-content .table-scroll-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1.25rem;
+}
+
+.post-content .table-scroll-wrapper table {
+  margin-bottom: 0;
+}
+
 .post-content table {
   border-collapse: collapse;
   width: 100%;

@@ -41,6 +41,15 @@ export function PostDetail({ slug }: PostDetailProps) {
       hljs.highlightElement(el as HTMLElement)
     })
 
+    // Wrap tables in scrollable container for mobile
+    document.querySelectorAll('.post-content table').forEach((table) => {
+      if (table.parentElement?.classList.contains('table-scroll-wrapper')) return
+      const wrapper = document.createElement('div')
+      wrapper.className = 'table-scroll-wrapper'
+      table.parentNode?.insertBefore(wrapper, table)
+      wrapper.appendChild(table)
+    })
+
     document.querySelectorAll('.post-content pre').forEach((pre) => {
       if (pre.querySelector('.code-copy-btn')) return
       const btn = document.createElement('button')
