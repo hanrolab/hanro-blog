@@ -12,7 +12,7 @@ interface DeviceMockupProps {
 
 function LaptopMockup({ title, accent = '#e5e5e5', image }: { title: string; accent?: string; image?: string }) {
   return (
-    <div className="relative w-[360px] lg:w-[480px]">
+    <div className="relative w-[280px] sm:w-[360px] lg:w-[480px]">
       <div className="rounded-t-xl border border-[#d1d1d1] bg-[#1a1a1a] p-1">
         <div className="flex items-center gap-1.5 rounded-t-lg bg-[#2a2a2a] px-3 py-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-[#ff5f57]" />
@@ -73,7 +73,7 @@ function PhoneMockup({ title, accent = '#e5e5e5', image }: { title: string; acce
 
 function TabletMockup({ accent = '#e5e5e5', image, label = '' }: { accent?: string; image?: string; label?: string }) {
   return (
-    <div className="relative hidden w-[180px] lg:block">
+    <div className="relative hidden w-[160px] md:block lg:w-[180px]">
       <div className="rounded-[14px] border-2 border-[#2a2a2a] bg-[#1a1a1a] p-1">
         <div className="aspect-[3/4] rounded-[10px] bg-white overflow-hidden">
           {image ? (

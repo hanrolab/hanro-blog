@@ -10,7 +10,7 @@ interface TocItem {
   level: number
 }
 
-export function TableOfContents({ contentReady }: { readonly contentReady?: boolean }) {
+export function TableOfContents({ contentReady, onNavigate }: { readonly contentReady?: boolean; readonly onNavigate?: () => void }) {
   const [headings, setHeadings] = useState<TocItem[]>([])
   const [activeId, setActiveId] = useState('')
   const headingEls = useRef<Element[]>([])
@@ -99,6 +99,7 @@ export function TableOfContents({ contentReady }: { readonly contentReady?: bool
                 if (!el) return
                 const top = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET
                 window.scrollTo({ top, behavior: 'smooth' })
+                onNavigate?.()
               }}
             >
               {item.text}

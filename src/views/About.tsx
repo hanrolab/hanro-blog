@@ -30,7 +30,7 @@ const journey = [
 
 export function About() {
   return (
-    <main className="pb-24 pt-28 px-10">
+    <main className="pb-24 pt-28 px-6 sm:px-10">
       {/* Hero */}
       <motion.section
         initial={{ opacity: 0, y: 30 }}
@@ -112,7 +112,7 @@ export function About() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
-              className="flex items-center gap-8 border-b border-border py-6"
+              className="flex items-center gap-4 sm:gap-8 border-b border-border py-6"
             >
               <span className="w-24 shrink-0 text-xs tracking-[0.1em] text-text-muted">
                 {item.period}

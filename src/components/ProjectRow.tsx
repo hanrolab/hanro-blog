@@ -63,19 +63,19 @@ export function ProjectRow({ project, index }: ProjectRowProps) {
               <>
                 {project.techDetail.frontend && (
                   <div className="flex gap-2">
-                    <span className="w-[80px] shrink-0 font-semibold text-[#3B82F6]">Frontend</span>
+                    <span className="w-[60px] sm:w-[80px] shrink-0 font-semibold text-[#3B82F6]">Frontend</span>
                     <span className="text-text-secondary">{project.techDetail.frontend.join(', ')}</span>
                   </div>
                 )}
                 {project.techDetail.backend && (
                   <div className="flex gap-2">
-                    <span className="w-[80px] shrink-0 font-semibold text-[#10B981]">Backend</span>
+                    <span className="w-[60px] sm:w-[80px] shrink-0 font-semibold text-[#10B981]">Backend</span>
                     <span className="text-text-secondary">{project.techDetail.backend.join(', ')}</span>
                   </div>
                 )}
                 {project.techDetail.infra && (
                   <div className="flex gap-2">
-                    <span className="w-[80px] shrink-0 font-semibold text-[#F59E0B]">Infra</span>
+                    <span className="w-[60px] sm:w-[80px] shrink-0 font-semibold text-[#F59E0B]">Infra</span>
                     <span className="text-text-secondary">{project.techDetail.infra.join(', ')}</span>
                   </div>
                 )}

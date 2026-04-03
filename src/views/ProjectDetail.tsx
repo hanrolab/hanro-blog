@@ -33,7 +33,7 @@ function ChapterToggle({ num, title, count, children, defaultOpen = false }: { n
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="pb-6 pl-10">
+            <div className="pb-6 pl-4 sm:pl-10">
               {children}
             </div>
           </motion.div>
@@ -87,8 +87,10 @@ function ItemToggleList({ items, accent }: { items: readonly ToggleItem[]; accen
                 transition={{ duration: 0.25 }}
                 className="overflow-hidden"
               >
-                <div className="mx-4 mb-4 ml-[60px] rounded-lg border border-border/40 bg-bg-card px-6 py-5 text-[15px] leading-[1.9] text-text-primary whitespace-pre-line">
-                  {item.content}
+                <div className="mx-4 mb-4 ml-4 sm:ml-[60px] rounded-lg border border-border/40 bg-bg-card px-6 py-5 text-[15px] leading-[1.9] text-text-primary whitespace-pre-line">
+                  {item.content.split(/\*\*(.*?)\*\*/g).map((part, idx) =>
+                    idx % 2 === 1 ? <strong key={idx} className="text-[16px] font-semibold">{part}</strong> : part
+                  )}
                 </div>
               </motion.div>
             )}
@@ -144,35 +146,18 @@ const highlightContentData: Record<string, Record<string, string>> = {
     'Kotest BDD + E2E 테스트 자동화': '25개 도메인에 걸친 대규모 리팩토링(UUID v7 전환, 멀티 컴퍼니 전환, categoryTab String→UUID 전환)을 안전하게 수행하려면 자동화된 테스트가 필수였습니다.\n\n백엔드는 Kotest의 DescribeSpec(BDD 스타일)과 MockK를 조합합니다. "describe 판매 서비스 - context 판매 입력 시 - it 거래처가 없으면 BadRequestException을 던진다" 형태로 테스트를 구조화하여, 테스트 코드 자체가 비즈니스 요구사항 문서 역할을 합니다. ERP 전체 도메인(자금, 계정, 판매, 구매, 재고)에 TDD를 적용하여 서비스 레이어의 핵심 로직을 검증합니다.\n\nQueryDSL은 Spring Data JPA 공식 QueryDSL이 deprecated되면서 OpenFeign fork v7.0 + KSP(Kotlin Symbol Processing)로 전환했습니다. KAPT(Kotlin Annotation Processing Tool) 기반에서 KSP로 바꾸면서 Q-클래스(QPlmEntity, QVendorEntity 등) 코드 생성 속도가 크게 향상되었습니다. build.gradle.kts에서 ksp 플러그인 설정과 kotlin.sourceSets.main에 generated 경로를 추가하고, allOpen 플러그인으로 JPA 엔티티의 프록시 생성 문제도 해결했습니다.\n\n프론트엔드는 Vitest로 단위 테스트, Playwright로 E2E 테스트를 수행합니다. E2E 테스트는 실제 브라우저에서 로그인 → 메뉴 진입 → 데이터 조회 → 생성 → 수정 → 삭제의 전체 CRUD 흐름을 자동 검증합니다. 7개 핵심 도메인(PLM, 거래처, 판매, 구매, 결재, 자금, 인사)을 커버하여, 배포 전 회귀 테스트를 자동화했습니다.\n\n이 테스트 인프라의 진짜 가치는 리팩토링에 대한 자신감입니다. categoryTabId를 String에서 UUID로 전환할 때, 백엔드 서비스 + 프론트엔드 API + Zustand 스토어까지 전면 수정해야 했는데, 기존 테스트가 회귀 버그를 사전에 잡아주어 안전하게 배포할 수 있었습니다.',
   },
   'readip': {
-    'KMP로 Android/iOS 동시 지원 (코드 80%+ 공유)': 'Kotlin Multiplatform + Compose Multiplatform으로 Android와 iOS를 하나의 코드베이스로 개발합니다. UI, 비즈니스 로직, 네트워킹(Ktor), 데이터 모델, 로컬 저장(DataStore)을 commonMain에 작성하고, 인증(Google Credential Manager / Apple Sign-In), 결제(RevenueCat), 배터리 모니터링 등 플랫폼 고유 기능만 expect/actual 패턴으로 분리했습니다.\n\nKoin DI로 ViewModel과 API 클래스의 의존성을 주입하고, 서버 URL도 expect/actual로 분리하여 Android 에뮬레이터(10.0.2.2)와 iOS 시뮬레이터(localhost)를 자동 분기합니다.\n\n가장 어려웠던 점은 iOS 결제 연동이었습니다. RevenueCat SDK가 Swift 기반이라 KMP에서 직접 호출할 수 없어서, PurchaseBridge.kt(Kotlin)와 RevenueCatHelper.swift(Swift) 사이의 브릿지 패턴을 설계해야 했습니다. 콜백 기반 통신으로 구매, 복원, 로그인/로그아웃을 양방향으로 연결했습니다.',
+    'KMP로 Android/iOS 동시 지원 (코드 80%+ 공유)': '**코드 공유**\nKotlin Multiplatform + Compose Multiplatform으로 Android와 iOS를 하나의 코드베이스로 개발합니다. UI, 비즈니스 로직, 네트워킹(Ktor), 데이터 모델, 로컬 저장(DataStore)을 commonMain에 작성하고, 인증(Google Credential Manager / Apple Sign-In), 결제(RevenueCat), 배터리 모니터링 등 플랫폼 고유 기능만 expect/actual 패턴으로 분리했습니다.\n\n**로컬 테스트 환경 분기**\nAndroid 에뮬레이터(10.0.2.2)와 iOS 시뮬레이터(localhost)는 서버 접근 경로가 다르기 때문에, expect/actual로 플랫폼별 URL을 자동 분기합니다. 배포 환경에서는 URL이 하나로 통일되므로 별도 분기가 필요 없습니다.\n\n**결제 연동**\n가장 어려웠던 점은 iOS 결제 연동이었습니다. RevenueCat SDK가 Swift 기반이라 KMP에서 직접 호출할 수 없어서, PurchaseBridge.kt(Kotlin)와 RevenueCatHelper.swift(Swift) 사이의 브릿지 패턴을 설계해야 했습니다. 콜백 기반 통신으로 구매, 복원, 로그인/로그아웃을 양방향으로 연결했습니다.',
     'Gemini AI 기반 문맥 인식 번역': 'Gemini 2.0 Flash 모델을 활용한 실시간 번역 시스템입니다. 두 가지 번역 모드를 제공합니다.\n\n단어 번역(translateWord)은 선택한 단어의 뜻과 품사(명사, 동사, 형용사 등)를 추출하고, 문맥 번역(translateWithContext)은 단어가 포함된 전체 문장을 함께 전송하여 문맥에 맞는 번역을 제공합니다. 예를 들어 "bank"가 강둑인지 은행인지를 주변 문장으로 판별합니다.\n\n한국어, 영어, 일본어, 중국어, 스페인어, 프랑스어, 독일어 7개 언어를 지원하며, API 실패 시 exponential backoff(1초, 2초, 3초)로 최대 3회 재시도합니다. 429(Rate Limit)와 5xx 에러를 구분하여 재시도 여부를 판단합니다.\n\n어려웠던 점은 Gemini API의 응답 형식이 일관되지 않는 것이었습니다. JSON으로 응답하라고 프롬프트에 명시해도 가끔 마크다운이나 텍스트가 섞여서 돌아왔습니다. 정규식 기반 JSON 추출을 1차로 시도하고, 실패하면 raw 텍스트를 파싱하는 2단계 폴백 구조로 해결했습니다.',
     'CEFR A1~C2 레벨별 도서 큐레이션': '유럽 공통 언어 참조 기준(CEFR)에 따라 A1(입문)부터 C2(원어민)까지 6단계로 도서를 분류합니다. 각 레벨은 고유 색상(A1 초록 → C2 빨강 그라디언트)으로 시각적으로 구분되며, 레벨별·장르별 필터링과 정렬을 지원합니다.\n\n콘텐츠는 프로젝트 구텐베르크 등 퍼블릭 도메인 원서를 기반으로, Claude AI의 도움을 받아 한국어 번역과 CEFR 레벨 태깅을 진행합니다. upload_books.py 스크립트로 원문(en.txt)과 번역(ko.txt)을 서버에 업로드하고, 관리자 대시보드에서 메타데이터(장르, 레벨, 표지 이미지)를 관리합니다.\n\n홈 화면에서는 "이어 읽기", "짧은 글", "긴 글" 섹션별로 도서를 노출하고, 레벨별/장르별 전체 보기 화면에서 정렬(최신순, 제목순)과 필터를 제공합니다. 장르를 추가할 때는 enum, UI 아이콘, 색상, 서버 데이터를 모두 동기화해야 하므로 체크리스트를 만들어 관리합니다.',
     'Orbit MVI + Widget-Section-Screen 아키텍처': '초기에는 13개 화면에서 694줄짜리 모놀리스 ReadipApi를 직접 호출하는 구조였습니다. 화면마다 koinInject<ReadipApi>()를 쓰고 있었고, API 호출과 상태 관리가 Screen 안에 뒤섞여 있었습니다.\n\n이를 두 단계로 리팩토링했습니다.\n\n1단계: ReadipApi를 BookApi, ReadingApi, WordApi, ConfigApi, AccountApi 5개 도메인으로 분리하고, 14개 Orbit MVI ViewModel을 도입하여 모든 화면에서 API 직접 호출을 제거했습니다. State(불변 데이터 클래스) + Intent(상태 변경 함수) + SideEffect(일회성 이벤트) 패턴으로 상태를 관리합니다.\n\n2단계: 8개 Screen 파일의 private composable 함수를 widget/(재사용 UI 단위)과 section/(화면 영역) 파일로 분리했습니다. SettingsScreen 838줄 → 482줄, QuizScreen 802줄 → 287줄, FlashcardScreen 788줄 → 307줄 등 대폭 축소되었고, 신규 19개 파일을 생성하여 컴포넌트 재사용성을 높였습니다.\n\nMVVM 대신 Orbit MVI를 선택한 이유는 복잡한 상태 흐름(번역 → 저장 → 퀴즈 생성)에서 Intent 기반 단방향 데이터 흐름이 디버깅에 유리했기 때문입니다.',
     'RevenueCat 기반 Freemium 수익화': 'RevenueCat SDK를 활용하여 Android(Google Play Billing)와 iOS(StoreKit 2)의 구독 결제를 통합 관리합니다. 무료 유저는 5권까지 읽을 수 있고, 프리미엄 구독 시 전체 도서와 AI 번역을 무제한으로 이용할 수 있습니다.\n\n무료 도서 제한 수(free_book_limit)는 서버 설정에서 동적으로 관리하여 하드코딩 없이 운영할 수 있습니다. 이미 시작한 책은 제한에 걸려도 계속 읽을 수 있도록 하여 사용자 경험을 보호합니다.\n\n프리미엄 상태는 3중 레이어로 판별합니다: (1) RevenueCat 구독 상태, (2) 관리자 대시보드에서 수동 부여한 DB 프리미엄, (3) 서버 응답의 프리미엄 플래그. 셋 중 하나라도 true이면 프리미엄으로 처리합니다. AdminPremiumCache를 도입하여 테스트와 CS 대응 시 앱 재시작 없이 프리미엄을 부여할 수 있습니다.',
     'Next.js 관리자 대시보드': 'Next.js 16 + React 19 기반의 관리자 대시보드로, 도서 관리, 유저 관리, 태그 관리, 앱 설정, 통계를 제공합니다.\n\n도서 관리에서는 CRUD, 콘텐츠 업로드, 독자 현황 조회가 가능합니다. 태그 관리에서는 AI 기반 주제 태그 자동 생성(5개 추천), 태그 유사도 분석, 카테고리별 복수 선택을 지원합니다. 유저 관리에서는 읽기 통계와 함께 RevenueCat API 연동으로 프리미엄 수동 부여/해제가 가능합니다.\n\n앱 설정(Config) 페이지에서는 무료 도서 제한 수, 기능 플래그 등을 서버 재시작 없이 실시간으로 변경할 수 있습니다. 랜딩 페이지도 포함되어 있어 App Store, Google Play 링크와 스크린샷을 노출합니다.\n\nCloudflare Pages에 배포하고, Supabase를 데이터베이스로 사용합니다. Edge Runtime으로 서버리스 API 라우트를 운영하여 콜드 스타트를 최소화했습니다.',
-  },
-  'mungnyanglog': {
-    'Firebase OAuth 인증 (Google / Apple)': '글로벌 시장 진출을 위해 카카오/네이버를 제외하고 Google, Apple 로그인만 채택.\n\n클라이언트에서 Firebase로 인증 후 ID Token을 서버에 전송하면, 서버는 Firebase Admin SDK로 토큰을 검증하는 구조입니다. 토큰 갱신, 세션 유지, 로그아웃 처리는 Firebase Auth에 위임하여 인증 로직을 단순화했습니다.\n\n에러 핸들링은 서버에서 커스텀 에러 코드만 반환하고, 클라이언트에서 다국어 토스트 메시지로 파싱하는 구조로 글로벌 대응했습니다.\n\n회원 탈퇴는 30일 유예 기간을 두고, 매일 새벽 스케줄러가 탈퇴 신청 후 30일이 지난 유저를 확인하여 관련 데이터를 삭제합니다. 관련 데이터는 탈퇴자 ID를 쿼리에서 필터링하는 방식으로, 대량 soft delete 없이 효율적으로 처리했습니다.',
-    '가족 그룹 생성 / 초대 / 권한 관리': '초대 코드(대문자, I, 1 제외), 링크, 이메일, 카카오톡 공유 4가지 방식으로 가족을 초대합니다. 초대 코드는 24시간 만료이며, 클라이언트에서 타이머를 표시하고 만료 시 재발급 UI를 노출합니다. 캐시 없이 항상 서버 조회하여 모든 구성원이 동일한 상태를 봅니다.\n\n권한은 읽기/쓰기/삭제의 다중 권한 구조이며, Admin만 권한 조작이 가능합니다. 영유아 등 가족 구성원의 잘못된 조작을 방지하기 위해 삭제/수정 권한을 제한했습니다. 게스트 모드는 펫시터 등 임시 접근용으로, 실시간 산책 추적을 허용하면서도 데이터 수정은 차단합니다.\n\n그룹 탈퇴 시 본인이 작성한 데이터는 유지되지만 가족 그룹에서는 비노출 처리합니다. Owner는 모든 구성원이 탈퇴해야만 그룹을 삭제할 수 있습니다. DB는 그룹-유저 N:N 관계이며, FK 없이 ID 참조 방식으로 설계했습니다.',
-    'GPS 실시간 산책 추적 (경로 시각화, 거리/시간)': 'Android는 Google Maps SDK, iOS는 MapKit으로 플랫폼별 지도를 구현하고, 칼만 필터(Kalman Filter)로 GPS 노이즈를 보정하여 경로 튀김을 최소화했습니다.\n\n위치 수집은 10초 간격 또는 10m 이상 이동 시 트리거되며, 사람의 보행/달리기 속도 범위를 벗어나는 이동(차량 등)은 필터링합니다. 백그라운드에서도 위치 추적이 동작하며, 수집 간격을 조정하여 배터리 소모를 줄였습니다.\n\n산책 시작 시 KMP DataStore에 로컬 저장을 시작하고, 중간중간 위도/경도를 누적 저장합니다. 폴리라인으로 실시간 경로를 시각화하며, 1km 마일스톤 달성 시 지도에 마커를 표시합니다. 비정상 종료 시에도 DataStore에서 복구하여 데이터 유실을 방지합니다. 1분 미만 산책은 저장하지 않습니다.\n\n산책 중 사진 촬영, 배변 기록, 메모를 남길 수 있으며, 종료 시 요약 화면에서 전체 기록을 확인하고, 산책 경로가 가족 게시글에 자동 업로드됩니다. 경로 데이터는 전부 서버에 저장하여 향후 AI 분석 데이터로 활용할 수 있도록 설계했습니다.\n\n가장 어려웠던 점은 GPS 경로 보정이었습니다. 초기에는 경로가 갑자기 50m씩 튀거나, 제자리에서 빙글빙글 도는 현상이 심했습니다. 필터를 강하게 걸면 폴리라인이 실시간으로 그려지지 않아 답답했고, 약하게 걸면 경로가 튀었습니다. 칼만 필터를 적용하여 상당 부분 개선했지만, 통신 환경에 따라 완벽하지는 않았습니다.',
-    'GCP Signed URL 미디어 보안': '가족 간 공유되는 반려동물 사진이 외부에 유출되지 않도록 GCP Cloud Storage + Signed URL(15분 만료)로 접근을 제한했습니다. 프로필, 게시글, 산책 사진 등 용도별로 버킷을 분리하고, 서버에서 접근 URL을 캐시 처리하여 반복 요청을 줄였습니다.\n\n초기에는 서버에서 이미지 리사이징을 처리했으나, 한 장당 최대 10MB x 10장 = 100MB를 서버로 전송하는 구조가 너무 느렸습니다. 이를 클라이언트에서 리사이징(80% 압축) 후 병렬 업로드하는 방식으로 전환하여 속도를 대폭 개선했습니다. 서버는 Signed URL 발급과 접근 경로(버킷 + ID + 타임스탬프) 관리만 담당합니다.\n\n클라이언트에서는 Coil 라이브러리로 이미지를 캐싱하고, 업로드 시 병렬 처리 후 정상 응답을 받으면 즉시 사용자에게 노출하여 UX를 최적화했습니다.',
-    'FCM 푸시 알림 + 딥링크 네비게이션': 'Spring Boot + Firebase Admin SDK로 가족 그룹 가입, 게시글 작성, 산책 완료, 결제 완료 등의 이벤트에 푸시 알림을 발송합니다. 알림 카테고리별 ON/OFF 설정을 제공하며, 포그라운드에서도 상단에 알림이 표시됩니다.\n\n푸시 토큰은 FCM 특성상 계속 변경되기 때문에, 로그인 성공 시와 자동 로그인(스플래시) 시 두 시점에서 토큰을 업데이트합니다. 로그인 시에는 클라이언트에서 서버로 토큰을 전송하는 타이밍에 저장하고, 자동 로그인 시에는 스플래시 단계에서 갱신합니다.\n\n가장 어려웠던 점은 데이터 정합성이었습니다. 가족 초대 알림을 포그라운드에서 눌러 진입했는데 가족 그룹 정보가 보이지 않는 문제가 있었고, 원인은 클라이언트 캐시였습니다. 이후 캐시 초기화 공통 유틸 함수를 만들어 알림 진입 시 항상 최신 데이터를 조회하도록 개선했습니다.',
-    'Spring AI Function Calling 기반 AI 펫 상담사': 'Gemini 2.5 Flash 모델을 활용한 AI 펫 상담사입니다. 반려동물을 선택하면 산책 기록, 건강검진 이력, 예방접종 일정, 병원 스케줄 등 해당 반려동물의 전체 데이터를 기반으로 자연어 질의응답이 가능합니다.\n\nSpring AI Function Calling으로 건강검진별, 산책별, 권한별 등 카테고리별 프롬프트를 세분화하여 응답 정확도를 높였습니다.\n\n가장 어려웠던 점은 서버 데이터가 필요 없는 일반 질문에서 AI 응답 품질이 떨어지는 문제였습니다. 서버에서 동일한 Function Calling을 반복 호출하면서 불필요한 응답을 생성했기 때문입니다. 이를 해결하기 위해 클라이언트에도 같은 모델을 탑재하고, 질문이 서버 데이터가 필요한지 클라이언트에서 먼저 판별하도록 했습니다. 서버 데이터가 불필요하면 클라이언트에서 바로 응답하고, 필요하면 서버 API를 호출하는 2단계 구조로 개선하여 응답 속도와 품질을 모두 높였습니다.',
-    '가족 범위 게시글 공유 (사진/미디어, 펫 태깅)': '가족 구성원만 볼 수 있는 게시글 피드입니다. 사진과 텍스트를 올릴 수 있으며, 산책 완료 시 산책 경로가 자동으로 게시글에 업로드됩니다. 반려동물을 다중 태깅할 수 있어 펫별로 기록을 모아볼 수 있고, 무한 스크롤로 피드를 탐색합니다.\n\n어려웠던 점은 탈퇴 유저의 게시글 처리였습니다. 회원 탈퇴 시 게시글을 soft delete하면 대량 업데이트가 필요했기 때문에, 게시글 조회 시점에 탈퇴 유저를 필터링하는 방식으로 처리했습니다. 가족 그룹 탈퇴 시에는 그룹 소속이 아니므로 자연스럽게 조회 대상에서 제외됩니다.',
-    '사업자 등록 후 투자 유치 시도': '사업자 등록을 완료하고 프라이머 배치 28기에 지원하여 투자 유치를 시도했습니다.\n\nIR 덱의 핵심 메시지는 "가족 공유를 통한 유대감 증진"이었고, 수익 모델은 AI 펫 상담사, AI 건강 집계 리포트 등 AI 기반 프리미엄 구독과 반려식품 커머스를 설계했습니다. 반려식품은 외부 업체와 실제 생산 계획을 수립하고 샘플까지 제작·수령하는 단계까지 진행했습니다.\n\n결과적으로 프라이머 배치 28기는 불합격했지만, 이 과정에서 가장 크게 배운 것은 "포기도 큰 용기가 필요하다"는 것이었습니다. 주변에서는 포기를 나쁜 것처럼 말하지만, 적절한 포기가 오히려 나를 지키는 길이고, 그 과정에서 무언가를 얻었다면 그것만으로도 충분히 의미 있는 경험이라고 느꼈습니다.\n\n처음에는 포기했다고 생각했지만, 지금 돌아보면 IR 덱 작성, 사업 모델 설계, 시장 분석 등 창업 전반의 경험이 개발자로서의 시야를 넓혀주었고, 무엇보다 미래에 후회하지 않을 선택을 했다는 것이 가장 큰 배움이었습니다.',
-    '카페 운영과 병행하며 1인 개발': '약 1년간 카페를 운영하면서 기획, 디자인, 개발, 사업을 혼자 진행했습니다. 카페 업무를 마치고 평일·주말 남는 시간을 전부 개발에 투자했습니다.\n\n카페를 선택한 이유는 사장 업무를 미리 경험할 수 있는 기회라고 생각했기 때문입니다. 단순 아르바이트가 아니라 직원 관리, 스케줄 관리, 발주 관리 등 운영 전반을 직접 담당했고, 멍냥로그가 잘 되어 대표가 되었을 때를 대비해 미리 경영 감각을 쌓아두자는 마음으로 임했습니다.\n\n디자인은 처음에 외주를 맡겼지만 결과물이 만족스럽지 않아 Figma를 직접 배워서 작업했습니다.\n\n1인 개발에서 가장 힘들었던 점은 방향을 모른다는 것이었습니다. 피드백을 줄 사람이 없어서 내가 가는 방향이 맞는지 확신이 없었고, 기능 하나를 추가하는 데도 정말 많이 고민했습니다. 막상 추가하고 나중에 돌아보면 항상 아쉬운 점이 보였고, 그럴 때는 주변에 반려동물을 키우는 사람들에게 적극적으로 조언을 구하며 방향을 잡아갔습니다.',
+    '퀴즈 · 플래시카드 단어 학습': '읽기 중 저장한 단어를 퀴즈와 플래시카드로 복습하는 학습 시스템입니다. 두 가지 학습 모드를 제공합니다.\n\n퀴즈 모드는 저장된 단어에서 4지선다 문제를 자동 생성합니다. 정답과 오답 3개를 조합하여 매번 다른 문제를 출제하고, 정답률을 추적하여 취약 단어를 파악할 수 있습니다. 플래시카드 모드는 단어와 뜻을 카드 형태로 반복 학습하며, 학습 완료 여부를 마킹할 수 있습니다.\n\n월별 학습 스트릭(잔디) 시각화로 꾸준한 학습을 유도하고, 목표 기반 학습 시스템으로 일일 단어 학습 목표를 설정할 수 있습니다. 각 단어는 어떤 책에서 저장했는지 출처가 기록되어, 문맥과 함께 복습이 가능합니다.',
+    'Google/Apple 멀티 프로바이더 인증': 'Android는 Google Credential Manager, iOS는 네이티브 Apple Sign-In을 사용하며, KMP의 expect/actual 패턴으로 AuthManager를 플랫폼별로 구현했습니다.\n\n서버의 AuthService에서 Google은 tokeninfo API로 aud(audience)를 검증하고, Apple은 JWKS(JSON Web Key Set)에서 kid(Key ID)로 공개키를 찾아 JWT 서명을 RSA로 검증합니다. Apple은 첫 로그인 시에만 이메일을 제공하고 이후에는 sub(subject) 클레임만 반환하는 정책이 있어, 첫 인증 응답을 즉시 DB에 저장하는 로직을 최우선으로 배치했습니다.\n\nApple Guidelines 5.1.1(v)을 준수하여 Guest 모드도 지원합니다. 로그인 없이 기본 기능(도서 읽기, 단어 번역)을 사용할 수 있고, Guest 상태에서 저장한 읽기 진행률과 단어 데이터는 로그인 시 서버로 자동 마이그레이션됩니다. 충돌 시 max() 정책(더 많이 읽은 쪽 유지)으로 병합합니다.',
   },
 }
 
 const troubleshootingData: Record<string, readonly ToggleItem[]> = {
-  'realm': [
-    { title: 'DB 연결 끊김 — HikariCP keepalive + 프론트 heartbeat 다층 방어', content: 'Cloudtype에 호스팅한 PostgreSQL이 일정 시간이 지나면 연결이 조용히 끊기는 문제가 발생했습니다. 데이터가 저장되지 않는데 에러 메시지도 없어서 원인을 찾기까지 시간이 걸렸습니다.\n\n서버 측에서는 HikariCP keepalive-time을 2분으로 설정하여 연결 유효성을 주기적으로 체크하고, connection-timeout, validation-timeout, max-lifetime, idle-timeout을 세밀하게 조정했습니다.\n\n프론트 측에서는 /auth/health 헬스체크 엔드포인트를 추가하고, 2분 주기 heartbeat로 서버 상태를 사전 감지하는 connectionStore를 구현했습니다. authFetch에 15초 timeout과 5xx 응답 시 자동 재시도 로직도 추가하여 다층으로 방어했습니다.' },
-    { title: '오프라인 감지 + 저장 실패 복구 — draft 백업 + 재시도 큐', content: 'DB 연결 끊김 문제를 겪으면서, 네트워크 불안정 상황에서의 데이터 유실을 근본적으로 방어해야겠다고 판단했습니다.\n\nconnectionStore로 online/offline 상태를 감지하고, 저장에 실패한 요청을 큐에 쌓아 네트워크 복구 시 자동 재전송하는 구조를 만들었습니다. draftStore를 통해 localStorage에 문서 내용을 실시간 백업하여, 브라우저가 꺼져도 마지막 작성 내용을 복원할 수 있습니다.\n\nauthFetch에는 네트워크 에러 시 최대 3회 exponential backoff 재시도를 적용했고, 문서 편집 화면에 저장 상태(Saving/Saved/Save failed)를 실시간으로 표시하여 사용자가 현재 상태를 알 수 있게 했습니다.' },
-    { title: 'TipTap 문서 자동 저장 실패 — debounce + 낙관적 업데이트', content: '문서 편집 중 내용이 간헐적으로 저장되지 않는 문제가 발생했습니다. 원인은 빠른 타이핑 시 API 요청이 race condition을 일으키는 것이었습니다.\n\nZustand에 debounce된 저장 로직을 구현하여 타이핑이 멈춘 후 일정 시간 뒤에만 저장 요청을 보내도록 했고, 낙관적 업데이트 패턴을 적용하여 서버 응답을 기다리지 않고 즉시 UI에 반영하되, 실패 시 롤백하는 방식으로 해결했습니다.' },
-    { title: 'psql에서 한글 파일명 Unicode 깨짐 — DB 정책 수립', content: 'psql 콘솔에서 doc_page.content를 직접 UPDATE했더니, r2:// 이미지 URL에 포함된 한글 파일명의 Unicode 정규화(NFD→NFC)가 깨져서 이미지가 모두 깨지는 문제가 발생했습니다.\n\n이후 doc_page.content는 SQL로 직접 UPDATE하지 않는다는 DB 정책을 수립하고, 반드시 애플리케이션 레이어를 통해서만 수정하도록 규칙을 만들었습니다.' },
-    { title: 'R2 Presigned URL CORS 에러 — Cloudflare Workers 프록시', content: '브라우저에서 R2 Presigned URL로 직접 파일을 업로드할 때 CORS 에러가 발생했습니다.\n\nCloudflare Workers를 프록시로 두어 CORS 헤더를 제어하고, 파일 검증 로직도 추가하여 해결했습니다.' },
-    { title: '한글 IME Enter 버그 — isComposing 체크', content: '문서 제목 입력란에서 한글을 입력하고 Enter를 누르면, 한글 조합이 끝나지 않은 상태에서 Enter가 동작하여 의도치 않게 에디터로 포커스가 이동하는 버그가 발생했습니다.\n\n원인은 한글 IME(입력기)의 조합 중(composing) 상태에서 Enter 키 이벤트가 발생하는 것이었습니다. onKeyDown 핸들러에 e.nativeEvent.isComposing 체크를 추가하여, IME 조합 중에는 Enter 동작을 무시하도록 수정했습니다.' },
-  ],
   'b3d-ods': [
     { title: 'Count 기반 라우팅에서 RESTful API로 전환', content: '레거시 시스템은 단일 HomeController에서 CallData.do?Count=1(PLM 목록), AddData.do?Count=5(데이터 생성) 같은 숫자 기반 라우팅을 사용하고 있었습니다. 205개의 Count 값이 있었고, 새로운 기능을 추가할 때마다 "다음 Count 번호가 뭐지?"를 확인해야 했습니다.\n\n단순히 URL만 바꾸는 게 아니라 API 설계 철학 자체를 전환해야 했습니다. 리소스 중심의 RESTful 엔드포인트(/api/plm/products, /api/sales/entries)로 재설계하고, 공통 응답 포맷(success, data, error, meta)을 도입했습니다. 페이지네이션은 page/size 파라미터와 PaginatedResponse 유틸리티로 통일했습니다.\n\n가장 어려웠던 점은 레거시 DB의 테이블 구조를 새 도메인 모델에 매핑하는 것이었습니다. clothdata → PlmEntity, rminformation_table → VendorEntity, erp_table → SalesEntity/PurchaseEntity로 전환하면서 컬럼 이름, 타입, 관계를 전부 재설계해야 했습니다.' },
     { title: 'AI 응답을 구조화된 UI로 렌더링하기', content: 'Gemini AI가 Function Calling으로 데이터를 조회한 뒤, 결과를 사용자에게 어떻게 보여줄지가 가장 큰 고민이었습니다. AI가 마크다운 테이블로 응답하면 읽기 어렵고, JSON을 그대로 보여주면 일반 사용자가 이해할 수 없습니다.\n\nBlock UI 시스템을 설계했습니다. AI의 Tool 실행 결과를 CapturedToolResult로 캡처하고, AiBlockBuilder가 데이터 형태에 따라 적절한 Block 타입(TextBlock, TableBlock, CardListBlock, SuggestionBlock)으로 변환합니다. 프론트엔드의 BlockRenderer는 block.type을 switch문으로 분기하여 각 Block에 맞는 위젯을 렌더링합니다.\n\nTableBlockWidget에서는 테이블 데이터를 클립보드에 복사(탭 구분)하거나, UTF-8 BOM이 포함된 CSV로 내보낼 수 있습니다. "수정 요청" 버튼을 누르면 useChatStore의 setPrefillInput("이 표에서 ")이 호출되어, 다음 메시지 입력창에 자동으로 텍스트가 채워집니다. 이런 식으로 데이터 조회 → 확인 → 후속 질문이 자연스럽게 이어지는 UX를 만들었습니다.' },
@@ -226,15 +211,15 @@ function ImageCarousel({ images, title, accent: _accent }: { images: string[]; t
         <>
           <button
             onClick={prev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 flex h-16 w-16 items-center justify-center rounded-full bg-white/60 backdrop-blur-md text-text-primary shadow-lg transition-all hover:bg-white/80 hover:scale-110"
+            className="absolute left-4 top-1/2 -translate-y-1/2 flex h-10 w-10 md:h-16 md:w-16 items-center justify-center rounded-full bg-white/60 backdrop-blur-md text-text-primary shadow-lg transition-all hover:bg-white/80 hover:scale-110"
           >
-            <ChevronLeft className="h-7 w-7" />
+            <ChevronLeft className="h-5 w-5 md:h-7 md:w-7" />
           </button>
           <button
             onClick={next}
-            className="absolute right-4 top-1/2 -translate-y-1/2 flex h-16 w-16 items-center justify-center rounded-full bg-white/60 backdrop-blur-md text-text-primary shadow-lg transition-all hover:bg-white/80 hover:scale-110"
+            className="absolute right-4 top-1/2 -translate-y-1/2 flex h-10 w-10 md:h-16 md:w-16 items-center justify-center rounded-full bg-white/60 backdrop-blur-md text-text-primary shadow-lg transition-all hover:bg-white/80 hover:scale-110"
           >
-            <ChevronRight className="h-7 w-7" />
+            <ChevronRight className="h-5 w-5 md:h-7 md:w-7" />
           </button>
         </>
       )}
@@ -406,56 +391,6 @@ export function ProjectDetail({ id }: { readonly id: string }) {
           </div>
           </div>
 
-          {/* Business — 멍냥로그 전용 */}
-          {project.id === 'mungnyanglog' && (
-            <div className="mt-14">
-              <h2 className="mb-5 flex items-center gap-3 text-[16px] font-bold tracking-[0.05em] text-text-primary">
-                <span className="h-5 w-[3px] rounded-full" style={{ backgroundColor: '#f59e0b' }} />
-                BUSINESS
-              </h2>
-              <p className="text-[17px] leading-[1.9] text-text-primary mb-8">
-                사업자 등록 후 프라이머 배치 28기에 지원하여 투자 유치를 시도한 1인 창업 프로젝트입니다.
-              </p>
-
-              {/* IR Deck Carousel */}
-              <div className="mb-8">
-                <h3 className="mb-4 text-[15px] font-semibold text-text-primary">IR Deck (사업계획서)</h3>
-                <ImageCarousel
-                  images={Array.from({ length: 12 }, (_, i) => `https://pub-fce05bb72018417aa88c032932bfeb49.r2.dev/portfolio/ir-deck-${String(i + 1).padStart(2, '0')}.png`)}
-                  title="IR Deck"
-                  accent="#f59e0b"
-                />
-              </div>
-
-              {/* Primer Application */}
-              <div className="mb-8">
-                <h3 className="mb-4 text-[15px] font-semibold text-text-primary">프라이머 배치 28기 지원</h3>
-                <div className="overflow-hidden rounded-xl border border-border bg-[#f8f9fa]">
-                  <img
-                    src="https://pub-fce05bb72018417aa88c032932bfeb49.r2.dev/portfolio/primer-apply-1.png"
-                    alt="프라이머 배치 28기 지원서"
-                    className="w-full object-contain"
-                  />
-                </div>
-              </div>
-
-              {/* YouTube Demo */}
-              <div className="mb-8">
-                <h3 className="mb-4 text-[15px] font-semibold text-text-primary">Product Demo</h3>
-                <div className="overflow-hidden rounded-xl border border-border">
-                  <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                    <iframe
-                      className="absolute inset-0 h-full w-full"
-                      src="https://www.youtube.com/embed/rwA1AL3qpaE"
-                      title="멍냥로그 Demo"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
 
 
         </motion.div>

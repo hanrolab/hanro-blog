@@ -1,6 +1,6 @@
 import { SiSpringboot, SiKotlin, SiReact, SiTypescript, SiPostgresql, SiRedis, SiDocker, SiNextdotjs, SiFirebase, SiJetpackcompose, SiSupabase, SiTailwindcss, SiMinutemailer } from 'react-icons/si'
 import { RiRobot2Fill } from 'react-icons/ri'
-import { TbDatabase, TbApi, TbBrandOauth, TbPackage, TbBox } from 'react-icons/tb'
+import { TbDatabase, TbApi, TbBrandOauth, TbPackage, TbBox, TbCloud } from 'react-icons/tb'
 import type { IconType } from 'react-icons'
 
 export const skillIconMap: Record<string, { icon: IconType; color: string }> = {
@@ -33,6 +33,11 @@ export const skillIconMap: Record<string, { icon: IconType; color: string }> = {
   'Material 3': { icon: TbBox, color: '#757575' },
   'Orbit MVI': { icon: TbPackage, color: '#7F52FF' },
   'Next.js Admin': { icon: SiNextdotjs, color: '#111111' },
+  'AWS': { icon: TbCloud, color: '#FF9900' },
+  'AWS EC2': { icon: TbCloud, color: '#FF9900' },
+  'Koin': { icon: TbPackage, color: '#F5A623' },
+  'Ktor': { icon: TbApi, color: '#7F52FF' },
+  'Compose Multiplatform': { icon: SiJetpackcompose, color: '#4285F4' },
   'OAuth2': { icon: TbBrandOauth, color: '#EB5424' },
   'JWT': { icon: TbApi, color: '#000000' },
   'Java': { icon: SiKotlin, color: '#ED8B00' },

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
 
-const PROTECTED_PATHS = ['/write', '/edit']
+const PROTECTED_PATHS = ['/write', '/edit', '/portfolio']
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl

@@ -7,6 +7,9 @@ let _aws: AwsClient | null = null
 function getAwsClient(): AwsClient {
   if (!_aws) {
     const env = getEnv()
+    if (!env.R2_ACCESS_KEY_ID || !env.R2_SECRET_ACCESS_KEY) {
+      throw new Error('R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY are required for local dev')
+    }
     _aws = new AwsClient({
       accessKeyId: env.R2_ACCESS_KEY_ID,
       secretAccessKey: env.R2_SECRET_ACCESS_KEY,
@@ -17,6 +20,9 @@ function getAwsClient(): AwsClient {
 
 function getR2Url(key: string): string {
   const env = getEnv()
+  if (!env.R2_ENDPOINT || !env.R2_BUCKET_NAME) {
+    throw new Error('R2_ENDPOINT and R2_BUCKET_NAME are required for local dev')
+  }
   return `${env.R2_ENDPOINT}/${env.R2_BUCKET_NAME}/${key}`
 }
 

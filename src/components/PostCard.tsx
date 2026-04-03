@@ -7,7 +7,7 @@ interface PostCardProps {
 }
 
 export function PostCard({ post }: PostCardProps) {
-  const date = new Date(post.created_at).toLocaleDateString('ko-KR', {
+  const date = 'Written: ' + new Date(post.created_at).toLocaleDateString('ko-KR', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',

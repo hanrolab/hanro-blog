@@ -28,13 +28,6 @@ const career = [
     image: '📖',
   },
   {
-    period: '2025.03 — 2026.03',
-    title: '멍냥로그',
-    desc: '반려동물 앱 -사업자 등록 후 투자 유치 시도, 카페 병행 운영',
-    tag: 'Founder',
-    image: '🐾',
-  },
-  {
     period: '2025.03 — 2026.02',
     title: '샬로우커피',
     desc: '카페 사장대리 -직원 약 10명 규모, 연매출 1억원 (근무 기간 중 최저·최고 매출 달성)',
@@ -67,8 +60,8 @@ function InfoList({ items }: { items: readonly { period: string; desc: string }[
   return (
     <div className="space-y-4">
       {items.map((item) => (
-        <div key={item.period + item.desc} className="flex gap-6">
-          <span className="w-[150px] shrink-0 text-[0.9375rem] text-text-muted whitespace-nowrap">{item.period}</span>
+        <div key={item.period + item.desc} className="flex flex-col gap-1 sm:flex-row sm:gap-6">
+          <span className="sm:w-[150px] sm:shrink-0 text-[0.9375rem] text-text-muted sm:whitespace-nowrap">{item.period}</span>
           <span className="text-[1rem] leading-[1.7] text-text-secondary">{item.desc}</span>
         </div>
       ))}
@@ -101,8 +94,8 @@ function CertSection() {
       <SectionTitle>자격증 / 수료증</SectionTitle>
       <div className="space-y-3">
         {visible.map((cert) => (
-          <div key={cert.desc} className="flex gap-6">
-            <span className="w-[150px] shrink-0 text-[0.9375rem] text-text-muted whitespace-nowrap">{cert.period}</span>
+          <div key={cert.desc} className="flex flex-col gap-1 sm:flex-row sm:gap-6">
+            <span className="sm:w-[150px] sm:shrink-0 text-[0.9375rem] text-text-muted sm:whitespace-nowrap">{cert.period}</span>
             <div>
               <span className="text-[1rem] leading-[1.7] text-text-secondary">{cert.desc}</span>
               <span className="ml-2 text-[0.875rem] text-text-muted">·</span>
@@ -330,8 +323,8 @@ export function Home() {
               <SectionTitle>경력 사항</SectionTitle>
               <div className="space-y-6">
                 {career.map((item) => (
-                  <div key={item.title} className="flex gap-6">
-                    <h4 className="w-[100px] shrink-0 text-[1.125rem] font-bold text-text-primary">{item.title}</h4>
+                  <div key={item.title} className="flex flex-col gap-1 sm:flex-row sm:gap-6">
+                    <h4 className="sm:w-[100px] sm:shrink-0 text-[1.125rem] font-bold text-text-primary">{item.title}</h4>
                     <div>
                       <p className="text-[0.9375rem] leading-[1.7] text-text-primary">{item.desc}</p>
                       <p className="mt-1 text-[0.8125rem] text-text-muted">

@@ -1,10 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { List } from 'lucide-react'
 import { BlogHeader } from '@/components/BlogHeader'
 import { TableOfContents } from '@/components/TableOfContents'
 import { AdminControls } from '@/components/AdminControls'
-import { sanitizeHtml } from '@/lib/sanitize'
 import type { Post } from '@/lib/types'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github.css'
@@ -23,6 +23,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 export function PostDetail({ slug }: PostDetailProps) {
   const [post, setPost] = useState<Post | null>(null)
   const [loading, setLoading] = useState(true)
+  const [mobileTocOpen, setMobileTocOpen] = useState(false)
 
   useEffect(() => {
     fetch(`/api/posts/${slug}`)
@@ -95,8 +96,6 @@ export function PostDetail({ slug }: PostDetailProps) {
     month: 'long',
     day: 'numeric',
   })
-  const sanitizedContent = sanitizeHtml(post.content)
-
   return (
     <div className="min-h-screen bg-bg">
       <BlogHeader />
@@ -130,7 +129,7 @@ export function PostDetail({ slug }: PostDetailProps) {
             {/* Content */}
             <div
               className="post-content"
-              dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+              dangerouslySetInnerHTML={{ __html: post.content }}
             />
           </article>
 
@@ -142,6 +141,28 @@ export function PostDetail({ slug }: PostDetailProps) {
           </aside>
         </div>
       </div>
+
+      {/* Mobile TOC FAB */}
+      <button
+        onClick={() => setMobileTocOpen(!mobileTocOpen)}
+        className="fixed bottom-6 right-6 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-text-primary text-bg shadow-lg xl:hidden"
+        aria-label="Table of Contents"
+      >
+        <List className="h-5 w-5" />
+      </button>
+
+      {/* Mobile TOC Overlay */}
+      {mobileTocOpen && (
+        <div className="fixed inset-0 z-30 xl:hidden" onClick={() => setMobileTocOpen(false)}>
+          <div
+            className="absolute bottom-20 right-4 w-64 max-h-[60vh] overflow-y-auto rounded-xl border border-border bg-bg p-4 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="mb-3 text-[0.75rem] font-semibold tracking-wider text-text-muted">ON THIS PAGE</p>
+            <TableOfContents contentReady={!!post} onNavigate={() => setMobileTocOpen(false)} />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

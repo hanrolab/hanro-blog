@@ -21,7 +21,7 @@ export function BlogHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-bg will-change-transform">
-      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-8">
+      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-4 sm:px-8">
         <Link href="/" className="text-[1.125rem] font-bold tracking-tight text-text-primary">
           Hanro Blog
         </Link>
