@@ -52,6 +52,9 @@ function DetailModal({ data, onClose }: { data: ModalData; onClose: () => void }
 
   useEffect(() => {
     closeRef.current?.focus()
+  }, [])
+
+  useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', handler)
     return () => document.removeEventListener('keydown', handler)
@@ -186,6 +189,7 @@ function TimelineCard({ step, index, isLast }: { step: PipelineStepData; index: 
           <>
             <button
               onClick={() => setExpanded(!expanded)}
+              aria-expanded={expanded}
               className="mt-3 flex items-center gap-1 rounded-lg bg-bg-card px-3 py-1.5 text-[13px] font-semibold text-text-muted hover:text-text-secondary transition-colors"
             >
               {expanded ? '접기' : '더보기'}
@@ -214,39 +218,41 @@ function TimelineCard({ step, index, isLast }: { step: PipelineStepData; index: 
   )
 }
 
-function MobileTimeline() {
-  const linear1 = STEPS.filter(s => ['01', '02', '03'].includes(s.id))
-  const branchStep = STEPS.find(s => s.id === '04')!
-  const branchA = STEPS.find(s => s.id === 'a12')!
-  const branchB = STEPS.find(s => s.id === 'b1')!
-  const linear2 = STEPS.filter(s => ['05', '06', '07', '08'].includes(s.id))
+// Stable ordered list for mobile timeline rendering
+const MOBILE_ORDER: PipelineStepData[] = [
+  STEPS[0], STEPS[1], STEPS[2],  // 01, 02, 03
+  STEPS[3],                       // 04 branch point
+  STEPS[4],                       // a12 branch-a
+  STEPS[5],                       // b1 branch-b
+  STEPS[6], STEPS[7], STEPS[8], STEPS[9], // 05-08
+]
 
-  let idx = 0
+function MobileTimeline() {
   return (
     <div className="space-y-0">
       {/* Steps 01-03 */}
-      {linear1.map((step) => (
-        <TimelineCard key={step.id} step={step} index={idx++} />
+      {MOBILE_ORDER.slice(0, 3).map((step, i) => (
+        <TimelineCard key={step.id} step={step} index={i} />
       ))}
 
       {/* Step 04: Branch point */}
-      <TimelineCard step={branchStep} index={idx++} isLast />
+      <TimelineCard step={MOBILE_ORDER[3]} index={3} isLast />
       <TimelineConnector variant="branch-start" />
 
       {/* Branch A: A1/A2 */}
-      <TimelineCard step={branchA} index={idx++} isLast />
+      <TimelineCard step={MOBILE_ORDER[4]} index={4} isLast />
       <div className="flex justify-center py-0.5">
         <span className="text-[12px] font-semibold text-text-muted tracking-wider">OR</span>
       </div>
       {/* Branch B: B1+ */}
-      <TimelineCard step={branchB} index={idx++} isLast />
+      <TimelineCard step={MOBILE_ORDER[5]} index={5} isLast />
 
       {/* Merge */}
       <TimelineConnector variant="branch-end" />
 
       {/* Steps 05-08 */}
-      {linear2.map((step, i) => (
-        <TimelineCard key={step.id} step={step} index={idx++} isLast={i === linear2.length - 1} />
+      {MOBILE_ORDER.slice(6).map((step, i) => (
+        <TimelineCard key={step.id} step={step} index={6 + i} isLast={i === 3} />
       ))}
     </div>
   )
@@ -254,7 +260,7 @@ function MobileTimeline() {
 
 // ─── Desktop ReactFlow ───────────────────────────────────
 
-function PipelineNode({ data }: { data: Record<string, string> }) {
+function PipelineNode({ data }: { data: PipelineStepData & { handles: string } }) {
   const openModal = useContext(ModalCtx)
   const { num, title, desc, variant, badge, sub, detail, handles } = data
   const styles: Record<string, { border: string; bg: string; numBg: string; numText: string }> = {
@@ -343,23 +349,6 @@ const edges: Edge[] = [
   { id: 'e07-08', source: '07', sourceHandle: 'sb', target: '08', targetHandle: 'tt', type: 'smoothstep', style: solid, markerEnd: arrow },
 ]
 
-// ─── Controls Styles ─────────────────────────────────────
-
-const controlsStyle = `
-  .react-flow__controls { gap: 4px; }
-  .react-flow__controls-button {
-    background-color: var(--color-bg-card) !important;
-    border: 1px solid var(--color-border) !important;
-    border-radius: 8px !important;
-    fill: var(--color-text-secondary) !important;
-    width: 28px !important;
-    height: 28px !important;
-  }
-  .react-flow__controls-button:hover {
-    background-color: var(--color-bg-card-hover) !important;
-  }
-`
-
 // ─── Exported Component ──────────────────────────────────
 
 export function ContentPipelineFlow() {
@@ -375,7 +364,6 @@ export function ContentPipelineFlow() {
 
       {/* Desktop: ReactFlow diagram */}
       <div className="hidden md:block h-[800px] w-full">
-        <style>{controlsStyle}</style>
         <ReactFlow
           nodes={nodes}
           edges={edges}
