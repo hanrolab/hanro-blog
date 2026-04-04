@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef, createContext, useContext } from 'react'
 import { createPortal } from 'react-dom'
-import { ReactFlow, Handle, Position, Controls, MarkerType, type Node, type Edge } from '@xyflow/react'
+import { ReactFlow, Handle, Position, MarkerType, type Node, type Edge } from '@xyflow/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronDown } from 'lucide-react'
 import '@xyflow/react/dist/style.css'
@@ -362,28 +362,26 @@ export function ContentPipelineFlow() {
         <MobileTimeline />
       </div>
 
-      {/* Desktop: ReactFlow diagram */}
-      <div className="hidden md:block h-[800px] w-full">
+      {/* Desktop: ReactFlow diagram (static, no internal scroll/pan) */}
+      <div className="hidden md:block h-[1600px] w-full">
         <ReactFlow
           nodes={nodes}
           edges={edges}
           nodeTypes={nodeTypes}
           fitView
-          fitViewOptions={{ padding: 0.12 }}
+          fitViewOptions={{ padding: 0.08 }}
           nodesDraggable={false}
           nodesConnectable={false}
           elementsSelectable={false}
-          panOnDrag
+          panOnDrag={false}
           panOnScroll={false}
           zoomOnScroll={false}
-          zoomOnPinch={true}
+          zoomOnPinch={false}
           zoomOnDoubleClick={false}
           preventScrolling={false}
           proOptions={{ hideAttribution: true }}
           className="!bg-transparent"
-        >
-          <Controls showInteractive={false} position="bottom-right" />
-        </ReactFlow>
+        />
       </div>
 
       {/* Detail modal */}
