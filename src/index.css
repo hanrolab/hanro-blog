@@ -893,8 +893,4 @@ body {
   --color-accent: #5ba3f5;
 }
 
-/* ReactFlow - disable internal scroll/pan, allow only node button clicks */
-.react-flow__pane {
-  pointer-events: none !important;
-}
 

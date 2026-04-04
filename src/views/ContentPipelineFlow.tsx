@@ -1,11 +1,9 @@
 'use client'
 
-import { useState, useCallback, useEffect, useRef, createContext, useContext } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { ReactFlow, Handle, Position, MarkerType, type Node, type Edge } from '@xyflow/react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ChevronDown } from 'lucide-react'
-import '@xyflow/react/dist/style.css'
+import { X, ChevronDown, ArrowRight, ArrowDown } from 'lucide-react'
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -27,8 +25,6 @@ interface ModalData {
   badge?: string
   detail: string
 }
-
-const ModalCtx = createContext<(d: ModalData) => void>(() => {})
 
 // ─── Shared Step Data ────────────────────────────────────
 
@@ -102,7 +98,7 @@ function DetailModal({ data, onClose }: { data: ModalData; onClose: () => void }
   )
 }
 
-// ─── Mobile Timeline ─────────────────────────────────────
+// ─── Shared Components ───────────────────────────────────
 
 function VariantBadge({ variant, badge, sub }: { variant: NodeVariant; badge?: string; sub?: string }) {
   const colors: Record<string, string> = {
@@ -121,7 +117,57 @@ function VariantBadge({ variant, badge, sub }: { variant: NodeVariant; badge?: s
   )
 }
 
-function TimelineConnector({ variant = 'default' }: { variant?: 'default' | 'branch-start' | 'branch-end' | 'emerald' | 'blue' }) {
+function StepCard({ step, onDetail, size = 'md' }: { step: PipelineStepData; onDetail?: (d: ModalData) => void; size?: 'sm' | 'md' }) {
+  const numColors: Record<string, { bg: string; text: string }> = {
+    ai: { bg: 'bg-text-primary', text: 'text-bg' },
+    'branch-a': { bg: 'bg-emerald-500/15', text: 'text-emerald-600 dark:text-emerald-400' },
+    'branch-b': { bg: 'bg-blue-500/15', text: 'text-blue-600 dark:text-blue-400' },
+    branch: { bg: 'bg-bg-card', text: 'text-text-muted' },
+    default: { bg: 'bg-bg-card', text: 'text-text-muted' },
+  }
+  const nc = numColors[step.variant] || numColors.default
+  const isSmall = size === 'sm'
+
+  return (
+    <div className={`rounded-2xl border bg-bg ${isSmall ? 'p-4' : 'p-5'} ${
+      step.variant === 'branch-a' ? 'border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/20' :
+      step.variant === 'branch-b' ? 'border-blue-500/40 bg-blue-50/50 dark:bg-blue-950/20' :
+      step.variant === 'branch' ? 'border-dashed border-border' :
+      'border-border'
+    }`}>
+      <div className="flex items-center gap-3 mb-2">
+        {step.num && (
+          <span className={`inline-flex ${isSmall ? 'h-7 w-7 text-[12px]' : 'h-8 w-8 text-[13px]'} items-center justify-center rounded-lg font-bold ${nc.bg} ${nc.text}`}>
+            {step.num}
+          </span>
+        )}
+        <VariantBadge variant={step.variant} badge={step.badge} sub={step.sub} />
+      </div>
+      <p className={`${isSmall ? 'text-[16px]' : 'text-[18px]'} font-bold text-text-primary leading-tight`}>{step.title}</p>
+      <p className={`mt-1.5 ${isSmall ? 'text-[13px]' : 'text-[14px]'} text-text-secondary leading-relaxed`}>{step.desc}</p>
+      {step.detail && onDetail && (
+        <button
+          onClick={() => onDetail({ title: step.title, badge: step.badge || '', detail: step.detail! })}
+          className={`mt-3 rounded-lg bg-bg-card px-3 py-1.5 ${isSmall ? 'text-[12px]' : 'text-[13px]'} font-semibold text-text-muted hover:text-text-secondary transition-colors`}
+        >
+          더보기
+        </button>
+      )}
+    </div>
+  )
+}
+
+function VerticalArrow() {
+  return (
+    <div className="flex justify-center py-2">
+      <ArrowDown className="h-5 w-5 text-text-muted/50" />
+    </div>
+  )
+}
+
+// ─── Mobile Timeline ─────────────────────────────────────
+
+function TimelineConnector({ variant = 'default' }: { variant?: 'default' | 'branch-start' | 'branch-end' }) {
   if (variant === 'branch-start') {
     return (
       <div className="flex justify-center py-1">
@@ -151,16 +197,8 @@ function TimelineConnector({ variant = 'default' }: { variant?: 'default' | 'bra
   )
 }
 
-function TimelineCard({ step, index, isLast }: { step: PipelineStepData; index: number; isLast?: boolean }) {
+function MobileTimelineCard({ step, index, isLast }: { step: PipelineStepData; index: number; isLast?: boolean }) {
   const [expanded, setExpanded] = useState(false)
-  const numColors: Record<string, { bg: string; text: string }> = {
-    ai: { bg: 'bg-text-primary', text: 'text-bg' },
-    'branch-a': { bg: 'bg-emerald-500/15', text: 'text-emerald-600 dark:text-emerald-400' },
-    'branch-b': { bg: 'bg-blue-500/15', text: 'text-blue-600 dark:text-blue-400' },
-    branch: { bg: 'bg-bg-card', text: 'text-text-muted' },
-    default: { bg: 'bg-bg-card', text: 'text-text-muted' },
-  }
-  const nc = numColors[step.variant] || numColors.default
 
   return (
     <motion.div
@@ -169,225 +207,161 @@ function TimelineCard({ step, index, isLast }: { step: PipelineStepData; index: 
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.4, delay: index * 0.06 }}
     >
-      <div className={`rounded-2xl border bg-bg p-5 ${
-        step.variant === 'branch-a' ? 'border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/20' :
-        step.variant === 'branch-b' ? 'border-blue-500/40 bg-blue-50/50 dark:bg-blue-950/20' :
-        step.variant === 'branch' ? 'border-dashed border-border' :
-        'border-border'
-      }`}>
-        <div className="flex items-center gap-3 mb-2">
-          {step.num && (
-            <span className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-[13px] font-bold ${nc.bg} ${nc.text}`}>
-              {step.num}
-            </span>
-          )}
-          <VariantBadge variant={step.variant} badge={step.badge} sub={step.sub} />
+      <StepCard step={step} size="sm" />
+      {step.detail && (
+        <div className="mt-1 ml-2">
+          <button
+            onClick={() => setExpanded(!expanded)}
+            aria-expanded={expanded}
+            className="flex items-center gap-1 rounded-lg px-2 py-1 text-[12px] font-semibold text-text-muted hover:text-text-secondary transition-colors"
+          >
+            {expanded ? '접기' : '더보기'}
+            <ChevronDown className={`h-3 w-3 transition-transform ${expanded ? 'rotate-180' : ''}`} />
+          </button>
+          <AnimatePresence>
+            {expanded && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="overflow-hidden"
+              >
+                <div className="mt-1 rounded-xl bg-[#1a1a2e] p-3 overflow-x-auto">
+                  <pre className="text-[12px] leading-[1.7] text-[#e2e8f0] font-mono whitespace-pre">{step.detail}</pre>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-        <p className="text-[18px] font-bold text-text-primary leading-tight">{step.title}</p>
-        <p className="mt-1.5 text-[14px] text-text-secondary leading-relaxed">{step.desc}</p>
-        {step.detail && (
-          <>
-            <button
-              onClick={() => setExpanded(!expanded)}
-              aria-expanded={expanded}
-              className="mt-3 flex items-center gap-1 rounded-lg bg-bg-card px-3 py-1.5 text-[13px] font-semibold text-text-muted hover:text-text-secondary transition-colors"
-            >
-              {expanded ? '접기' : '더보기'}
-              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${expanded ? 'rotate-180' : ''}`} />
-            </button>
-            <AnimatePresence>
-              {expanded && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.25 }}
-                  className="overflow-hidden"
-                >
-                  <div className="mt-3 rounded-xl bg-[#1a1a2e] p-4 overflow-x-auto">
-                    <pre className="text-[13px] leading-[1.7] text-[#e2e8f0] font-mono whitespace-pre">{step.detail}</pre>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </>
-        )}
-      </div>
+      )}
       {!isLast && <TimelineConnector />}
     </motion.div>
   )
 }
 
-// Stable ordered list for mobile timeline rendering
-const MOBILE_ORDER: PipelineStepData[] = [
-  STEPS[0], STEPS[1], STEPS[2],  // 01, 02, 03
-  STEPS[3],                       // 04 branch point
-  STEPS[4],                       // a12 branch-a
-  STEPS[5],                       // b1 branch-b
-  STEPS[6], STEPS[7], STEPS[8], STEPS[9], // 05-08
-]
-
 function MobileTimeline() {
   return (
     <div className="space-y-0">
-      {/* Steps 01-03 */}
-      {MOBILE_ORDER.slice(0, 3).map((step, i) => (
-        <TimelineCard key={step.id} step={step} index={i} />
+      {STEPS.slice(0, 3).map((step, i) => (
+        <MobileTimelineCard key={step.id} step={step} index={i} />
       ))}
-
-      {/* Step 04: Branch point */}
-      <TimelineCard step={MOBILE_ORDER[3]} index={3} isLast />
+      <MobileTimelineCard step={STEPS[3]} index={3} isLast />
       <TimelineConnector variant="branch-start" />
-
-      {/* Branch A: A1/A2 */}
-      <TimelineCard step={MOBILE_ORDER[4]} index={4} isLast />
+      <MobileTimelineCard step={STEPS[4]} index={4} isLast />
       <div className="flex justify-center py-0.5">
         <span className="text-[12px] font-semibold text-text-muted tracking-wider">OR</span>
       </div>
-      {/* Branch B: B1+ */}
-      <TimelineCard step={MOBILE_ORDER[5]} index={5} isLast />
-
-      {/* Merge */}
+      <MobileTimelineCard step={STEPS[5]} index={5} isLast />
       <TimelineConnector variant="branch-end" />
-
-      {/* Steps 05-08 */}
-      {MOBILE_ORDER.slice(6).map((step, i) => (
-        <TimelineCard key={step.id} step={step} index={6 + i} isLast={i === 3} />
+      {STEPS.slice(6).map((step, i) => (
+        <MobileTimelineCard key={step.id} step={step} index={6 + i} isLast={i === 3} />
       ))}
     </div>
   )
 }
 
-// ─── Desktop ReactFlow ───────────────────────────────────
+// ─── Desktop Layout (Pure CSS) ───────────────────────────
 
-function PipelineNode({ data }: { data: PipelineStepData & { handles: string } }) {
-  const openModal = useContext(ModalCtx)
-  const { num, title, desc, variant, badge, sub, detail, handles } = data
-  const styles: Record<string, { border: string; bg: string; numBg: string; numText: string }> = {
-    ai: { border: 'border-text-primary', bg: 'bg-bg', numBg: 'bg-text-primary', numText: 'text-bg' },
-    branch: { border: 'border-dashed border-text-muted/25', bg: 'bg-bg-card/50', numBg: 'bg-bg-card', numText: 'text-text-muted' },
-    'branch-a': { border: 'border-emerald-500/50', bg: 'bg-emerald-50 dark:bg-emerald-950/30', numBg: 'bg-emerald-500/15', numText: 'text-emerald-600 dark:text-emerald-400' },
-    'branch-b': { border: 'border-blue-500/50', bg: 'bg-blue-50 dark:bg-blue-950/30', numBg: 'bg-blue-500/15', numText: 'text-blue-600 dark:text-blue-400' },
-    default: { border: 'border-border', bg: 'bg-bg', numBg: 'bg-bg-card', numText: 'text-text-muted' },
-  }
-  const s = styles[variant] || styles.default
-  const h = handles ? handles.split(',') : []
+function DesktopPipeline({ onDetail }: { onDetail: (d: ModalData) => void }) {
   return (
-    <>
-      {h.includes('tl') && <Handle type="target" position={Position.Left} id="tl" className="!w-2 !h-2 !bg-text-muted !border-0" />}
-      {h.includes('tt') && <Handle type="target" position={Position.Top} id="tt" className="!w-2 !h-2 !bg-text-muted !border-0" />}
-      {h.includes('sr') && <Handle type="source" position={Position.Right} id="sr" className="!w-2 !h-2 !bg-text-muted !border-0" />}
-      {h.includes('sb') && <Handle type="source" position={Position.Bottom} id="sb" className="!w-2 !h-2 !bg-text-muted !border-0" />}
-      <div className={`rounded-2xl border-2 ${s.border} ${s.bg} px-7 py-6 w-[380px] shadow-sm`}>
-        <div className="flex items-center gap-3 flex-wrap">
-          {num && <span className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${s.numBg} text-[15px] font-bold ${s.numText}`}>{num}</span>}
-          {badge && <span className={`rounded-full px-3.5 py-1 text-[14px] font-bold ${variant === 'branch-a' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : variant === 'branch-b' ? 'bg-blue-500/15 text-blue-600 dark:text-blue-400' : 'bg-text-primary/8 text-text-primary'}`}>{badge}</span>}
-          {sub && <span className="text-[14px] text-text-muted">{sub}</span>}
+    <div className="space-y-0">
+      {/* Row 1: 01 → 02 → 03 (horizontal) */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="flex items-center gap-3"
+      >
+        <div className="flex-1"><StepCard step={STEPS[0]} onDetail={onDetail} /></div>
+        <ArrowRight className="h-5 w-5 text-text-muted/40 shrink-0" />
+        <div className="flex-1"><StepCard step={STEPS[1]} onDetail={onDetail} /></div>
+        <ArrowRight className="h-5 w-5 text-text-muted/40 shrink-0" />
+        <div className="flex-1"><StepCard step={STEPS[2]} onDetail={onDetail} /></div>
+      </motion.div>
+
+      <VerticalArrow />
+
+      {/* Row 2: 04 분기 (centered) */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="max-w-md mx-auto"
+      >
+        <StepCard step={STEPS[3]} onDetail={onDetail} />
+      </motion.div>
+
+      {/* Branch split indicator */}
+      <div className="flex justify-center py-3">
+        <div className="flex items-center gap-6">
+          <div className="h-8 w-0.5 rotate-[25deg] border-l-2 border-dashed border-emerald-400" />
+          <div className="h-8 w-0.5 -rotate-[25deg] border-l-2 border-dashed border-blue-400" />
         </div>
-        <p className="mt-3 text-[24px] font-bold text-text-primary leading-tight">{title}</p>
-        <p className="mt-2 text-[15px] text-text-secondary leading-relaxed">{desc}</p>
-        {detail && (
-          <button
-            onClick={() => openModal({ title, badge: badge || '', detail })}
-            className="mt-4 rounded-xl bg-bg-card px-4 py-2 text-[13px] font-semibold text-text-muted hover:bg-bg-card-hover hover:text-text-primary transition-all"
-          >
-            더보기
-          </button>
-        )}
       </div>
-    </>
+
+      {/* Row 3: Branches side by side */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.15 }}
+        className="grid grid-cols-2 gap-6"
+      >
+        <StepCard step={STEPS[4]} onDetail={onDetail} />
+        <StepCard step={STEPS[5]} onDetail={onDetail} />
+      </motion.div>
+
+      {/* Branch merge indicator */}
+      <div className="flex justify-center py-3">
+        <div className="flex items-center gap-6">
+          <div className="h-8 w-0.5 -rotate-[25deg] border-l-2 border-dashed border-emerald-400" />
+          <div className="h-8 w-0.5 rotate-[25deg] border-l-2 border-dashed border-blue-400" />
+        </div>
+      </div>
+
+      {/* Row 4-7: 05 → 06 → 07 → 08 (centered vertical) */}
+      {STEPS.slice(6).map((step, i) => (
+        <motion.div
+          key={step.id}
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.2 + i * 0.08 }}
+        >
+          <div className="max-w-md mx-auto">
+            <StepCard step={step} onDetail={onDetail} />
+          </div>
+          {i < 3 && <VerticalArrow />}
+        </motion.div>
+      ))}
+    </div>
   )
 }
-
-const nodeTypes = { pipeline: PipelineNode }
-
-// ─── Layout (pure const) ────────────────────────────────
-
-const W = 380
-const GAP = 60
-const VGAP = 80
-const CX = (W * 3 + GAP * 2 - W) / 2
-
-const r1 = 0
-const r2 = r1 + 220 + VGAP
-const r3 = r2 + 180 + VGAP
-const r4 = r3 + 220 + VGAP
-const r5 = r4 + 200 + VGAP
-const r6 = r5 + 200 + VGAP
-const r7 = r6 + 180 + VGAP
-
-const nodes: Node[] = [
-  { id: '01', position: { x: 0, y: r1 }, data: { ...STEPS[0], handles: 'sr' }, type: 'pipeline' },
-  { id: '02', position: { x: W + GAP, y: r1 }, data: { ...STEPS[1], handles: 'tl,sr' }, type: 'pipeline' },
-  { id: '03', position: { x: (W + GAP) * 2, y: r1 }, data: { ...STEPS[2], handles: 'tl,sb' }, type: 'pipeline' },
-  { id: '04', position: { x: CX, y: r2 }, data: { ...STEPS[3], handles: 'tt,sb' }, type: 'pipeline' },
-  { id: 'a12', position: { x: 0, y: r3 }, data: { ...STEPS[4], handles: 'tt,sb' }, type: 'pipeline' },
-  { id: 'b1', position: { x: (W + GAP) * 2, y: r3 }, data: { ...STEPS[5], handles: 'tt,sb' }, type: 'pipeline' },
-  { id: '05', position: { x: CX, y: r4 }, data: { ...STEPS[6], handles: 'tt,sb' }, type: 'pipeline' },
-  { id: '06', position: { x: CX, y: r5 }, data: { ...STEPS[7], handles: 'tt,sb' }, type: 'pipeline' },
-  { id: '07', position: { x: CX, y: r6 }, data: { ...STEPS[8], handles: 'tt,sb' }, type: 'pipeline' },
-  { id: '08', position: { x: CX, y: r7 }, data: { ...STEPS[9], handles: 'tt' }, type: 'pipeline' },
-]
-
-const solid = { stroke: '#d0d0d0', strokeWidth: 2.5 }
-const arrow = { type: MarkerType.ArrowClosed as const, color: '#c0c0c0', width: 22, height: 22 }
-const gDash = { stroke: '#10b981', strokeWidth: 2.5, strokeDasharray: '8 4' }
-const gArrow = { type: MarkerType.ArrowClosed as const, color: '#10b981', width: 22, height: 22 }
-const bDash = { stroke: '#3B82F6', strokeWidth: 2.5, strokeDasharray: '8 4' }
-const bArrow = { type: MarkerType.ArrowClosed as const, color: '#3B82F6', width: 22, height: 22 }
-
-const edges: Edge[] = [
-  { id: 'e01-02', source: '01', sourceHandle: 'sr', target: '02', targetHandle: 'tl', type: 'smoothstep', style: solid, markerEnd: arrow },
-  { id: 'e02-03', source: '02', sourceHandle: 'sr', target: '03', targetHandle: 'tl', type: 'smoothstep', style: solid, markerEnd: arrow },
-  { id: 'e03-04', source: '03', sourceHandle: 'sb', target: '04', targetHandle: 'tt', type: 'smoothstep', style: solid, markerEnd: arrow },
-  { id: 'e04-a', source: '04', sourceHandle: 'sb', target: 'a12', targetHandle: 'tt', type: 'default', animated: true, style: gDash, markerEnd: gArrow },
-  { id: 'e04-b', source: '04', sourceHandle: 'sb', target: 'b1', targetHandle: 'tt', type: 'default', animated: true, style: bDash, markerEnd: bArrow },
-  { id: 'ea-05', source: 'a12', sourceHandle: 'sb', target: '05', targetHandle: 'tt', type: 'default', animated: true, style: gDash, markerEnd: gArrow },
-  { id: 'eb-05', source: 'b1', sourceHandle: 'sb', target: '05', targetHandle: 'tt', type: 'default', animated: true, style: bDash, markerEnd: bArrow },
-  { id: 'e05-06', source: '05', sourceHandle: 'sb', target: '06', targetHandle: 'tt', type: 'smoothstep', style: solid, markerEnd: arrow },
-  { id: 'e06-07', source: '06', sourceHandle: 'sb', target: '07', targetHandle: 'tt', type: 'smoothstep', style: solid, markerEnd: arrow },
-  { id: 'e07-08', source: '07', sourceHandle: 'sb', target: '08', targetHandle: 'tt', type: 'smoothstep', style: solid, markerEnd: arrow },
-]
 
 // ─── Exported Component ──────────────────────────────────
 
 export function ContentPipelineFlow() {
   const [modal, setModal] = useState<ModalData | null>(null)
-  const openModal = useCallback((d: ModalData) => setModal(d), [])
 
   return (
-    <ModalCtx.Provider value={openModal}>
-      {/* Mobile: vertical timeline */}
+    <>
+      {/* Mobile */}
       <div className="md:hidden">
         <MobileTimeline />
       </div>
 
-      {/* Desktop: ReactFlow diagram (static, no internal scroll/pan) */}
-      <div className="hidden md:block h-[1600px] w-full">
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          nodeTypes={nodeTypes}
-          fitView
-          fitViewOptions={{ padding: 0.08 }}
-          nodesDraggable={false}
-          nodesConnectable={false}
-          elementsSelectable={false}
-          panOnDrag={false}
-          panOnScroll={false}
-          zoomOnScroll={false}
-          zoomOnPinch={false}
-          zoomOnDoubleClick={false}
-          preventScrolling={false}
-          proOptions={{ hideAttribution: true }}
-          className="!bg-transparent"
-        />
+      {/* Desktop */}
+      <div className="hidden md:block">
+        <DesktopPipeline onDetail={setModal} />
       </div>
 
       {/* Detail modal */}
       <AnimatePresence>
         {modal && <DetailModal key="detail-modal" data={modal} onClose={() => setModal(null)} />}
       </AnimatePresence>
-    </ModalCtx.Provider>
+    </>
   )
 }
