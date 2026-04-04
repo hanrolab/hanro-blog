@@ -766,7 +766,7 @@ export function ReadipShowcase() {
         </div>
 
         <h1 className="mt-2 text-[clamp(2.5rem,5vw,4rem)] font-bold leading-[1.05] text-text-primary">
-          Readip
+          Readip - 테스트
         </h1>
         <p className="mt-2 text-[20px] leading-relaxed text-text-secondary">
           AI 기반 영어 원서 읽기 + 어휘 학습 플랫폼
